@@ -2,7 +2,7 @@ import unittest
 from sqlalchemy import create_engine
 import toml
 from addict import Addict
-from pydb.db_client.base import BaseDBClient
+from pydb.client.base import BaseDBClient
 
 
 class MyTestCase(unittest.TestCase):
