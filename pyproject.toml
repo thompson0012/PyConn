@@ -5,7 +5,7 @@ description = "python database manipulation with advanced features"
 authors = ["Thompson <51963680+thompson0012@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.10, <4.0.0"
+python = ">=3.7, <4.0.0"
 SQLAlchemy = "^1.4.40"
 sqlmodel = "^0.0.8"
 pydantic = "^1.10.1"
@@ -13,6 +13,7 @@ toml = "^0.10.2"
 clickhouse-sqlalchemy = "^0.2.2"
 PyMySQL = "^1.0.2"
 addict = "^2.4.0"
+sqlglot = "^5.3.1"
 
 [tool.poetry.dev-dependencies]
 
