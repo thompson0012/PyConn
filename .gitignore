@@ -152,4 +152,4 @@ cython_debug/
 #.idea/
 poetry.lock
 *.xml
-pydb/tests/.toml
+tests/.toml
