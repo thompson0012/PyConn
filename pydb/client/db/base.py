@@ -1,24 +1,23 @@
 from abc import ABC
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from addict import Addict
 
 
 class BaseDBClient(ABC):
-    def __init__(self, engine):
-        self._db_engine:Engine = engine
+    def __init__(self, db_params):
+        self._db_params = db_params
 
     @classmethod
-    def from_db_user(cls, db_type, db_driver, host, user, password, port, db, charset='UTF-8', echo=True):
-        engine = create_engine(f"{db_type}+{db_driver}://{user}:{password}@{host}:{port}/{db}", echo=echo)
-        return cls(engine)
+    def from_db_params(cls, db_type, host, user, password, port, db, **kwargs):
+        db_params = Addict()
+        db_params.db_type = db_type
+        db_params.host = host
+        db_params.user = user
+        db_params.password = password
+        db_params.port = port
+        db_params.db = db
+        db_params.update(**kwargs)
 
-    @classmethod
-    def from_db_path(cls, url, echo=True):
-        engine = create_engine(f"{url}", echo=echo)
-        return cls(engine)
+        return cls(db_params.to_dict())
 
-    def get_db_engine(self):
-        return self._db_engine
-
-    def get_conn(self):
-        return self._db_engine.connect()
+    
