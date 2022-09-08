@@ -6,12 +6,9 @@ authors = ["Thompson <51963680+thompson0012@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
 python = ">=3.7, <4.0.0"
-SQLAlchemy = "^1.4.40"
 sqlmodel = "^0.0.8"
 pydantic = "^1.10.1"
 toml = "^0.10.2"
-clickhouse-sqlalchemy = "^0.2.2"
-PyMySQL = "^1.0.2"
 addict = "^2.4.0"
 sqlglot = "^5.3.1"
 flashtext = "^2.7"
@@ -21,6 +18,9 @@ Humre = "^0.2.0"
 [tool.poetry.dev-dependencies]
 google-cloud-storage = "^2.5.0"
 s3 = "^3.0.0"
+aiomysql = "^0.1.1"
+asyncpg = "^0.26.0"
+psycopg = "^3.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
