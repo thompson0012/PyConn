@@ -1,6 +1,7 @@
 from abc import ABC
 from sqlalchemy import create_engine
 from addict import Addict
+from typing import List
 
 
 class BaseDBClient(ABC):
@@ -31,8 +32,20 @@ class BaseDBClient(ABC):
         db_params.update(**kwargs)
         return cls(db_params.to_dict())
 
-    def connect(self):
+    def connect(self) -> "BaseDBClient":
         raise NotImplementedError
+
+    def reconnect(self):
+        return self.connect()
 
     def execute(self, sql):
         raise NotImplementedError
+
+    def execute_many(self, sql_ls: List[str]):
+        raise NotImplementedError
+
+    def get_conn(self):
+        return self._conn
+
+    def get_cursor(self):
+        return self._cursor
