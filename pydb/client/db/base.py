@@ -6,6 +6,11 @@ from addict import Addict
 class BaseDBClient(ABC):
     def __init__(self, db_params):
         self._db_params = db_params
+        self._conn = None
+        self._cursor = None
+
+    def get_db_params(self):
+        return self._db_params
 
     @classmethod
     def from_db_params(cls, db_type, host, user, password, port, db, **kwargs):
@@ -20,4 +25,14 @@ class BaseDBClient(ABC):
 
         return cls(db_params.to_dict())
 
-    
+    @classmethod
+    def from_raw_params(cls, **kwargs):
+        db_params = Addict()
+        db_params.update(**kwargs)
+        return cls(db_params.to_dict())
+
+    def connect(self):
+        raise NotImplementedError
+
+    def execute(self, sql):
+        raise NotImplementedError
