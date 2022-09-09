@@ -5,7 +5,7 @@ description = "python database manipulation with advanced features"
 authors = ["Thompson <51963680+thompson0012@users.noreply.github.com>"]
 
 [tool.poetry.dependencies]
-python = ">=3.7, <4.0.0"
+python = ">=3.7, <3.11"
 sqlmodel = "^0.0.8"
 pydantic = "^1.10.1"
 toml = "^0.10.2"
@@ -21,6 +21,7 @@ s3 = "^3.0.0"
 aiomysql = "^0.1.1"
 asyncpg = "^0.26.0"
 psycopg = "^3.1.1"
+google-cloud-bigquery = "^3.3.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
