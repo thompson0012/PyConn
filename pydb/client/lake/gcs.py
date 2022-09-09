@@ -37,15 +37,22 @@ class GCSClient(BaseLakeClient):
         self._client = Client(credentials=credential)
         self._conn = self._client.bucket(self.get_lake_params().get('bucket', {}))
 
-    def execute(self):
+    def execute(self, download_or_upload, destination_name, method, **kwargs):
         self._conn: Bucket
+        match download_or_upload:
+            case 'download':
+                return self.download(destination_name, method, **kwargs)
+            case 'upload':
+                return self.upload(destination_name, method, **kwargs)
+            case _:
+                raise KeyError('only support [download, upload]')
 
-    def upload(self, destination_name, obj, method):
+    def upload(self, destination_name, method, **kwargs):
         self._conn: Bucket
         blob = self._conn.blob(destination_name)
 
         controller = GCSFileUploadController(blob, destination_name)
-        q = controller.redirect(method)(obj)
+        q = controller.redirect(method)(**kwargs)
         return q
 
     def download(self, destination_name, method, **kwargs):
@@ -76,7 +83,7 @@ class GCSClient(BaseLakeClient):
         meta_data.add_meta_data('time_created', self._conn.time_created)
         meta_data.add_meta_data('versioning_enabled', self._conn.versioning_enabled)
         meta_data.add_meta_data('labels', self._conn.labels)
-        return meta_data
+        return meta_data.to_dict()
 
 
 class GCSFileController:
@@ -104,7 +111,7 @@ class GCSFileUploadController(GCSFileController):
                 return self._blob.upload_from_string
 
             case _:
-                raise KeyError('not supported method')
+                raise KeyError('only support [file, filename, string]')
 
 
 class GCSFileDownloadController(GCSFileController):
@@ -122,4 +129,4 @@ class GCSFileDownloadController(GCSFileController):
             case 'string':
                 return self._blob.download_as_string
             case _:
-                raise KeyError('not supported method')
+                raise KeyError('only support [local, bytes, text, string]')
