@@ -37,16 +37,6 @@ class GCSClient(BaseLakeClient):
         self._client = Client(credentials=credential)
         self._conn = self._client.bucket(self.get_lake_params().get('bucket', {}))
 
-    def execute(self, download_or_upload, destination_name, method, **kwargs):
-        self._conn: Bucket
-        match download_or_upload:
-            case 'download':
-                return self.download(destination_name, method, **kwargs)
-            case 'upload':
-                return self.upload(destination_name, method, **kwargs)
-            case _:
-                raise KeyError('only support [download, upload]')
-
     def upload(self, destination_name, method, **kwargs):
         self._conn: Bucket
         blob = self._conn.blob(destination_name)
