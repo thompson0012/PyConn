@@ -24,7 +24,7 @@ class BaseLakeClient(ABC):
     def connect(self):
         raise NotImplementedError
 
-    def execute(self):
+    def execute(self, download_or_upload, destination_name, method, **kwargs):
         raise NotImplementedError
 
     def get_conn(self):
