@@ -13,13 +13,20 @@ class GCSClientTestCase(unittest.TestCase):
         self.client = GCSClient.from_kv(bucket='yoov-data-team-dev', credentials=credentials)
         self.client.connect()
 
-    def test_upload_files(self):
+    def test_upload_local_file(self):
         self.client.execute('upload', 'pyproject-dev/pydb-connect/test_gcs_lake.py', method='filename',
                             filename=pathlib.Path.cwd() / 'test_gcs_lake.py')
 
-    def test_download_files(self):
-        self.client.execute('download', 'pyproject-dev/pydb-connect/test_gcs_lake.py', method='local',filename='t.py')
+    def test_upload_memory(self):
+        import pandas as pd
+        df = pd.DataFrame([[123, 123, 123]])
+        self.client.execute('upload', 'pyproject-dev/pydb-connect/test_file.csv', method='string', data=df.to_csv())
 
+    def test_download_files(self):
+        self.client.execute('download', 'pyproject-dev/pydb-connect/test_gcs_lake.py', method='local', filename='t.py')
+
+    def test_download_to_memory(self):
+        self.client.execute('download', 'pyproject-dev/pydb-connect/test_file.csv', method='string')
 
 if __name__ == '__main__':
     unittest.main()
