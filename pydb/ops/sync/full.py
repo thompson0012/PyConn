@@ -8,5 +8,4 @@ class FullSync(BaseSync):
 
     def sync_to(self,  target_db_client: BaseDBClient, sql: str):
         conn = target_db_client.connect()
-        conn.execute('DROP TABLE IF EXISTS')
-        conn.
+        conn.execute()

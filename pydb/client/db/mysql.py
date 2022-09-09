@@ -50,6 +50,7 @@ class MySQLClient(BaseDBClient):
             self._cursor.close()
             self._conn.close()
 
+
 class AsyncMySQLClient(MySQLClient):
     def __init__(self, db_params):
         super(AsyncMySQLClient, self).__init__(db_params)
