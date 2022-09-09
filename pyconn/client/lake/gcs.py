@@ -1,6 +1,6 @@
-from pydb.client.lake.base import BaseLakeClient
+from pyconn.client.lake.base import BaseLakeClient
 from google.oauth2 import service_account
-from pydb.utils.validator import validate_keys
+from pyconn.utils.validator import validate_keys
 from google.cloud.storage import Client, Bucket, Blob
 
 
@@ -54,7 +54,7 @@ class GCSClient(BaseLakeClient):
 
     def get_meta_data(self):
         self._conn: Bucket
-        from pydb.model.meta_data import MetaDataModel
+        from pyconn.model.meta_data import MetaDataModel
         meta_data = MetaDataModel()
         meta_data.add_meta_data('id', self._conn.id)
         meta_data.add_meta_data('name', self._conn.name)

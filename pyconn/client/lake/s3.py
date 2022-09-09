@@ -1,7 +1,7 @@
 import boto3
-from pydb.utils.validator import validate_keys
+from pyconn.utils.validator import validate_keys
 
-from pydb.client.lake.base import BaseLakeClient
+from pyconn.client.lake.base import BaseLakeClient
 
 
 class S3Client(BaseLakeClient):
@@ -23,8 +23,6 @@ class S3Client(BaseLakeClient):
         q = controller.redirect(method)(**kwargs)
         return q
 
-
-
     def get_meta_data(self):
         pass
 
@@ -38,7 +36,7 @@ class S3FileController:
         raise NotImplementedError
 
 
-class S3FileUploadController(S3FileController)
+class S3FileUploadController(S3FileController):
     def __init__(self, bucket, destination):
         super(S3FileUploadController, self).__init__(bucket, destination)
 

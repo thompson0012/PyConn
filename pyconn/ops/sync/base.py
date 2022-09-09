@@ -1,5 +1,5 @@
 from sqlalchemy.engine import Engine
-from pydb.client.db.base import BaseDBClient
+from pyconn.client.db.base import BaseDBClient
 
 
 class BaseSync:

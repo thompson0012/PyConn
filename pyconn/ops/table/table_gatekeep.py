@@ -1,4 +1,4 @@
-from pydb.ops.db.base import DBOperator
+from pyconn.ops.db.base import DBOperator
 
 
 class TableGateKeeper(DBOperator):

@@ -1,5 +1,5 @@
-from pydb.ops.sync.base import BaseSync
-from pydb.client.db.base import BaseDBClient
+from pyconn.ops.sync.base import BaseSync
+from pyconn.client.db.base import BaseDBClient
 
 
 class FullSync(BaseSync):

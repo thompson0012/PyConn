@@ -1,4 +1,4 @@
-from pydb.client.db.base import BaseDBClient
+from pyconn.client.db.base import BaseDBClient
 import aiomysql
 import pymysql
 from typing import List

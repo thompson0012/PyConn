@@ -1,17 +1,15 @@
-from pydb.client.db.base import BaseDBClient
-import asyncio
-import asyncpg
-import psycopg
+from pyconn.client.db.base import BaseDBClient
+import sqlite3
 from typing import List
 import flashtext
 
 
-class PostgresSQLClient(BaseDBClient):
+class SQLiteClient(BaseDBClient):
     def __init__(self, db_params):
-        super(PostgresSQLClient, self).__init__(db_params)
+        super(SQLiteClient, self).__init__(db_params)
 
     def connect(self):
-        conn = psycopg.connect(**self.get_db_params())
+        conn = sqlite3.connect(**self.get_db_params())
         self._conn = conn
         self._cursor = conn.cursor()
         return self
@@ -50,8 +48,3 @@ class PostgresSQLClient(BaseDBClient):
         finally:
             self._cursor.close()
             self._conn.close()
-
-
-class AsyncPostgresSQLClient(PostgresSQLClient):
-    def __init__(self, db_params):
-        super(AsyncPostgresSQLClient, self).__init__(db_params)
