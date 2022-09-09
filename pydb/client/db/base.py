@@ -27,7 +27,7 @@ class BaseDBClient(ABC):
         return cls(db_params.to_dict())
 
     @classmethod
-    def from_raw_params(cls, **kwargs):
+    def from_kv(cls, **kwargs):
         db_params = Addict()
         db_params.update(**kwargs)
         return cls(db_params.to_dict())
