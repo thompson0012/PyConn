@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "pydb"
+name = "pyconn"
 version = "0.1.0"
 description = "python database manipulation with advanced features"
 authors = ["Thompson <51963680+thompson0012@users.noreply.github.com>"]
