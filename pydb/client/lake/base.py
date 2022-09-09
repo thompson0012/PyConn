@@ -13,7 +13,7 @@ class BaseLakeClient(ABC):
         raise NotImplementedError
 
     @classmethod
-    def from_raw_params(cls, **kwargs):
+    def from_kv(cls, **kwargs):
         lake_params = Addict()
         lake_params.update(**kwargs)
         return cls(lake_params.to_dict())
@@ -22,4 +22,13 @@ class BaseLakeClient(ABC):
         return self._lake_params
 
     def connect(self):
+        raise NotImplementedError
+
+    def execute(self):
+        raise NotImplementedError
+
+    def get_conn(self):
+        return self._conn
+
+    def get_meta_data(self):
         raise NotImplementedError
