@@ -24,8 +24,20 @@ class BaseLakeClient(ABC):
     def connect(self):
         raise NotImplementedError
 
-    def execute(self, download_or_upload, destination_name, method, **kwargs):
+    def upload(self, destination_name, method, **kwargs):
         raise NotImplementedError
+
+    def download(self, destination_name, method, **kwargs):
+        raise NotImplementedError
+
+    def execute(self, download_or_upload, destination_name, method, **kwargs):
+        match download_or_upload:
+            case 'download':
+                return self.download(destination_name, method, **kwargs)
+            case 'upload':
+                return self.upload(destination_name, method, **kwargs)
+            case _:
+                raise KeyError('only support [download, upload]')
 
     def get_conn(self):
         return self._conn
