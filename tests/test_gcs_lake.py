@@ -23,7 +23,7 @@ class GCSClientTestCase(unittest.TestCase):
         self.client.execute('upload', 'pyproject-dev/pyconn-connect/test_file.csv', method='string', data=df.to_csv())
 
     def test_download_files(self):
-        self.client.execute('download', 'pyproject-dev/pyconn-connect/test_gcs_lake.py', method='local', filename='t.py')
+        self.client.execute('download', 'pyproject-dev/pyconn-connect/test_gcs_lake.py', method='local', filename='test_GCSClient.py')
 
     def test_download_to_memory(self):
         self.client.execute('download', 'pyproject-dev/pyconn-connect/test_file.csv', method='string')
