@@ -1,7 +1,7 @@
 from pyconn.client.db.base import BaseDBClient
 import sqlite3
 from typing import List
-import flashtext
+from pyconn.utils.db_utils import tuple_to_dict
 
 
 class SQLiteClient(BaseDBClient):
@@ -14,13 +14,13 @@ class SQLiteClient(BaseDBClient):
         self._cursor = conn.cursor()
         return self
 
-    def execute(self, sql):
-        read = False
-        kp = flashtext.KeywordProcessor()
-        kp.add_keyword('select')
-        if len(kp.extract_keywords(sql)) >= 1:
-            read = True
-        if read:
+    def execute(self, sql, keep_alive=False):
+        # should add auto-infer sql action
+        # read = False
+        # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
+        # if len(compiler.findall(sql)) == 0:
+        #     read = True
+        if keep_alive:
             q = self._cursor.execute(sql)
             return q
         try:
@@ -46,5 +46,12 @@ class SQLiteClient(BaseDBClient):
             self._conn.rollback()
 
         finally:
-            self._cursor.close()
-            self._conn.close()
+            self.close_conn()
+
+    def show_table_schema(self, tbl_name):
+        data = self.execute(f'pragma table_info({tbl_name})', keep_alive=True).fetchall()
+        return map(lambda x: tuple_to_dict(x, ['cid', 'name', 'type', 'notnull', 'dflt_value', 'pk']), data)
+
+    def show_table_ddl(self, tbl_name):
+        data = self.execute(f'select * from sqlite_schema where tbl_name="{tbl_name}"', keep_alive=True).fetchall()
+        return map(lambda x: tuple_to_dict(x, ['type', 'name', 'tbl_name', 'rootpage', 'sql']), data)
