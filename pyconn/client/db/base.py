@@ -38,7 +38,7 @@ class BaseDBClient(ABC):
     def reconnect(self):
         return self.connect()
 
-    def execute(self, sql):
+    def execute(self, sql, keep_alive: bool):
         raise NotImplementedError
 
     def execute_many(self, sql_ls: List[str]):
@@ -49,3 +49,14 @@ class BaseDBClient(ABC):
 
     def get_cursor(self):
         return self._cursor
+
+    def show_table_schema(self, tbl_name):
+        raise NotImplementedError
+
+    def show_table_ddl(self, tbl_name):
+        raise NotImplementedError
+
+    def close_conn(self):
+        self._cursor.close()
+        self._conn.close()
+        return
