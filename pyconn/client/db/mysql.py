@@ -2,7 +2,7 @@ from pyconn.client.db.base import BaseDBClient
 import aiomysql
 import pymysql
 from typing import List
-import flashtext
+from pyconn.utils.db_utils import tuple_to_dict
 
 
 class MySQLClient(BaseDBClient):
@@ -15,15 +15,12 @@ class MySQLClient(BaseDBClient):
         self._cursor = conn.cursor()
         return self
 
-    def execute(self, sql):
-        read = False
-        kp = flashtext.KeywordProcessor()
-        kp.add_keyword('select')
-        if len(kp.extract_keywords(sql)) >= 1:
-            read = True
-        if read:
+    def execute(self, sql, keep_alive=False):
+        if keep_alive:
             q = self._cursor.execute(sql)
-            return q
+            # pymysql after execute, will return an amount of rows that are affected,
+            # can't use fetchall to retrieval data directly
+            return self.get_cursor()
         try:
             self._cursor.execute(sql)
             self._conn.commit()
@@ -33,8 +30,7 @@ class MySQLClient(BaseDBClient):
             self._conn.rollback()
 
         finally:
-            self._cursor.close()
-            self._conn.close()
+            self.close_conn()
 
     def execute_many(self, sql_ls: List[str]):
         try:
@@ -49,6 +45,14 @@ class MySQLClient(BaseDBClient):
         finally:
             self._cursor.close()
             self._conn.close()
+
+    def show_table_schema(self, tbl_name):
+        data = self.execute(f'describe {tbl_name}', keep_alive=True).fetchall()
+        return map(lambda x: tuple_to_dict(x, ['field', 'type', 'null', 'key', 'default', 'extra']), data)
+
+    def show_table_ddl(self, tbl_name):
+        data = self.execute(f'show create table {tbl_name}', keep_alive=True).fetchall()
+        return map(lambda x: tuple_to_dict(x, ['table', 'sql']), data)
 
 
 class AsyncMySQLClient(MySQLClient):
