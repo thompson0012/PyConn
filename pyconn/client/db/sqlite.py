@@ -25,8 +25,7 @@ class SQLiteClient(BaseDBClient):
             q = self._cursor.execute(sql)
             if commit:
                 self._conn.commit()
-                return q
-            return q
+            return self._cursor
 
         validate_opts_value(commit, True)
         try:

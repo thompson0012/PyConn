@@ -26,7 +26,6 @@ class MySQLClient(BaseDBClient):
             q = self._cursor.execute(sql)
             if commit:
                 self._conn.commit()
-                return self._cursor
             return self._cursor
 
         validate_opts_value(commit, True)

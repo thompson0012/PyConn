@@ -24,12 +24,10 @@ class PostgresSQLClient(BaseDBClient):
         # if len(compiler.findall(sql)) == 0:
         #     read = True
         if keep_alive:
-            if commit:
-                q = self._cursor.execute(sql)
-                self._conn.commit()
-                return q
             q = self._cursor.execute(sql)
-            return q
+            if commit:
+                self._conn.commit()
+            return self._cursor
 
         validate_opts_value(commit, True)
         try:
