@@ -3,7 +3,7 @@ import aiomysql
 import pymysql
 from typing import List
 from pyconn.utils.db_utils import tuple_to_dict
-
+from pyconn.utils.validator import validate_opts_value
 
 class MySQLClient(BaseDBClient):
     def __init__(self, db_params):
@@ -16,21 +16,32 @@ class MySQLClient(BaseDBClient):
         return self
 
     def execute(self, sql, keep_alive=False):
-        if keep_alive:
-            q = self._cursor.execute(sql)
-            # pymysql after execute, will return an amount of rows that are affected,
-            # can't use fetchall to retrieval data directly
-            return self.get_cursor()
-        try:
-            self._cursor.execute(sql)
-            self._conn.commit()
+        def execute(self, sql, keep_alive=False, commit=True):
+            # should add auto-infer sql action
+            # read = False
+            # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
+            # if len(compiler.findall(sql)) == 0:
+            #     read = True
+            if keep_alive:
+                if commit:
+                    q = self._cursor.execute(sql)
+                    self._conn.commit()
+                    return q
+                q = self._cursor.execute(sql)
+                return q
 
-        except Exception as e:
-            print('failed', e)
-            self._conn.rollback()
+            validate_opts_value(commit, True)
+            try:
+                self._cursor.execute(sql)
+                self._conn.commit()
 
-        finally:
-            self.close_conn()
+            except Exception as e:
+                print('failed', e)
+                self._conn.rollback()
+
+            finally:
+                self._cursor.close()
+                self._conn.close()
 
     def execute_many(self, sql_ls: List[str]):
         try:

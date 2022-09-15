@@ -13,3 +13,10 @@ def validate_keys(data: dict, require=None):
         )
 
     return True
+
+
+def validate_opts_value(opts, value):
+    if opts == value:
+        return True
+
+    raise ValueError(f'{opts} must be {value}')

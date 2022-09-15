@@ -38,7 +38,7 @@ class BaseDBClient(ABC):
     def reconnect(self):
         return self.connect()
 
-    def execute(self, sql, keep_alive: bool):
+    def execute(self, sql, keep_alive: bool, commit=True):
         raise NotImplementedError
 
     def execute_many(self, sql_ls: List[str]):

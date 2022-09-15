@@ -15,6 +15,6 @@ class IncrementalSync(BaseSync):
         updated_records = self.get_records(sql)
         return updated_records
 
-    def sync_to(self, target_db_client, sqls: List[str]):
+    def sync_to(self, target_db_client, sql: List[str]):
         conn = target_db_client.connect()
-        conn.execute(sqls)
+        conn.execute(sql, keep_alive=True)

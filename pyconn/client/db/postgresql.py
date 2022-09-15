@@ -3,7 +3,8 @@ import asyncio
 import asyncpg
 import psycopg
 from typing import List
-import flashtext
+import humre
+from pyconn.utils.validator import validate_opts_value
 
 
 class PostgresSQLClient(BaseDBClient):
@@ -16,15 +17,21 @@ class PostgresSQLClient(BaseDBClient):
         self._cursor = conn.cursor()
         return self
 
-    def execute(self, sql):
-        read = False
-        kp = flashtext.KeywordProcessor()
-        kp.add_keyword('select')
-        if len(kp.extract_keywords(sql)) >= 1:
-            read = True
-        if read:
+    def execute(self, sql, keep_alive=False, commit=True):
+        # should add auto-infer sql action
+        # read = False
+        # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
+        # if len(compiler.findall(sql)) == 0:
+        #     read = True
+        if keep_alive:
+            if commit:
+                q = self._cursor.execute(sql)
+                self._conn.commit()
+                return q
             q = self._cursor.execute(sql)
             return q
+
+        validate_opts_value(commit, True)
         try:
             self._cursor.execute(sql)
             self._conn.commit()
@@ -48,8 +55,7 @@ class PostgresSQLClient(BaseDBClient):
             self._conn.rollback()
 
         finally:
-            self._cursor.close()
-            self._conn.close()
+            self.close_conn()
 
 
 class AsyncPostgresSQLClient(PostgresSQLClient):
