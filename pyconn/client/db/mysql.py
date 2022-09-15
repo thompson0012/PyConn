@@ -5,6 +5,7 @@ from typing import List
 from pyconn.utils.db_utils import tuple_to_dict
 from pyconn.utils.validator import validate_opts_value
 
+
 class MySQLClient(BaseDBClient):
     def __init__(self, db_params):
         super(MySQLClient, self).__init__(db_params)
@@ -15,33 +16,31 @@ class MySQLClient(BaseDBClient):
         self._cursor = conn.cursor()
         return self
 
-    def execute(self, sql, keep_alive=False):
-        def execute(self, sql, keep_alive=False, commit=True):
-            # should add auto-infer sql action
-            # read = False
-            # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
-            # if len(compiler.findall(sql)) == 0:
-            #     read = True
-            if keep_alive:
-                if commit:
-                    q = self._cursor.execute(sql)
-                    self._conn.commit()
-                    return q
-                q = self._cursor.execute(sql)
-                return q
-
-            validate_opts_value(commit, True)
-            try:
-                self._cursor.execute(sql)
+    def execute(self, sql, keep_alive=False, commit=True):
+        # should add auto-infer sql action
+        # read = False
+        # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
+        # if len(compiler.findall(sql)) == 0:
+        #     read = True
+        if keep_alive:
+            q = self._cursor.execute(sql)
+            if commit:
                 self._conn.commit()
+                return self._cursor
+            return self._cursor
 
-            except Exception as e:
-                print('failed', e)
-                self._conn.rollback()
+        validate_opts_value(commit, True)
+        try:
+            self._cursor.execute(sql)
+            self._conn.commit()
 
-            finally:
-                self._cursor.close()
-                self._conn.close()
+        except Exception as e:
+            print('failed', e)
+            self._conn.rollback()
+
+        finally:
+            self._cursor.close()
+            self._conn.close()
 
     def execute_many(self, sql_ls: List[str]):
         try:
