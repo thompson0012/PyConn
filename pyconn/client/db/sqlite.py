@@ -22,11 +22,10 @@ class SQLiteClient(BaseDBClient):
         # if len(compiler.findall(sql)) == 0:
         #     read = True
         if keep_alive:
+            q = self._cursor.execute(sql)
             if commit:
-                q = self._cursor.execute(sql)
                 self._conn.commit()
                 return q
-            q = self._cursor.execute(sql)
             return q
 
         validate_opts_value(commit, True)
