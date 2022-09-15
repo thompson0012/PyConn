@@ -1,11 +1,8 @@
-from pyconn.ops.sync.base import BaseSync
 from pyconn.client.db.base import BaseDBClient
+from pyconn.ops.sync.base import BaseSyncClient
 
 
-class FullSync(BaseSync):
-    def __init__(self, db_client: BaseDBClient):
-        super(FullSync, self).__init__(db_client)
+class FullSyncClient(BaseSyncClient):
+    def __init__(self, source_client=None, target_client=None):
+        super(FullSyncClient, self).__init__(source_client, target_client)
 
-    def sync_to(self,  target_db_client: BaseDBClient, sql: str):
-        conn = target_db_client.connect()
-        conn.execute()

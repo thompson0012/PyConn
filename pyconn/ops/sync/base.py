@@ -1,22 +1,5 @@
-from sqlalchemy.engine import Engine
 from pyconn.client.db.base import BaseDBClient
-
-
-class BaseSync:
-    def __init__(self, db_client: BaseDBClient):
-        self._db_client = db_client
-
-    def get_records(self, statement):
-        return self.get_conn().execute(statement)
-
-    def get_conn(self):
-        return self._db_client.get_conn()
-
-    def get_cursor(self):
-        return self._db_client.get_cursor()
-
-    def sync_to(self, target_db_client: BaseDBClient, sql: str):
-        pass
+from pyconn.utils.db_utils import substitute_sql
 
 
 class BaseSyncClient:
@@ -26,6 +9,7 @@ class BaseSyncClient:
 
         self._extract_sql = None
         self._load_sql = None
+        self._transform_func = None
 
     def register_source(self, client: BaseDBClient):
         self._source_client = client
@@ -40,15 +24,42 @@ class BaseSyncClient:
         self._source_client.connect()
         return
 
+    def close_all(self):
+        self._source_client.close_conn()
+        self._target_client.close_conn()
+        return
+
     def register_extract_sql(self, sql):
         self._extract_sql = sql
         return
 
     def register_load_sql(self, sql):
         self._load_sql = sql
+        return
 
-    def batch_job(self, batch_size):
-        while self._source_client.execute(self._extract_sql, True, True).fetchmany(batch_size):
-            self._target_client.execute(self._load_sql, True, True)
+    def register_transform_func(self, partial_func):
+        self._transform_func = partial_func
+        return
+
+    def get_source_client(self):
+        return self._source_client
+
+    def get_target_client(self):
+        return self._target_client
+
+    def sync_job(self, batch_size):
+        job_count = 0
+        q = self._source_client.execute(self._extract_sql, True, True)
+        while True:
+
+            print(job_count)
+            rows = q.fetchmany(batch_size)
+
+            if bool(rows):
+                break
+            sub_sql = substitute_sql(self._load_sql,
+                                     rows)
+            self._target_client.execute(sub_sql, True, True)
+            job_count += 1
 
         return
