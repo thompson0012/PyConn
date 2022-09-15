@@ -20,3 +20,9 @@ def validate_opts_value(opts, value):
         return True
 
     raise ValueError(f'{opts} must be {value}')
+
+
+def validate_opts_type(opts, type_):
+    if isinstance(opts, type_):
+        return True
+    raise TypeError(f'{opts} should be {type_}')
