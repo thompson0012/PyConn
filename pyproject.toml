@@ -25,6 +25,8 @@ google-cloud-bigquery = "^3.3.2"
 modin = {extras = ["dask"], version = "^0.15.3"}
 boto3 = "^1.24.69"
 flashtext = "^2.7"
+sqloxide = "^0.1.22"
+Faker = "^14.2.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
