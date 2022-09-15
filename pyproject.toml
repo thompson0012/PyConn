@@ -27,6 +27,7 @@ boto3 = "^1.24.69"
 flashtext = "^2.7"
 sqloxide = "^0.1.22"
 Faker = "^14.2.0"
+PySnooper = "^1.1.1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
