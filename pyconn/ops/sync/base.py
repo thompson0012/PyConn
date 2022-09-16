@@ -2,7 +2,7 @@ from pyconn.client.db.base import BaseDBClient
 from pyconn.utils.db_utils import substitute_sql
 
 
-class BaseSyncClient:
+class BaseSyncDBClient:
     def __init__(self, source_client=None, target_client=None):
         self._source_client: BaseDBClient = source_client
         self._target_client: BaseDBClient = target_client
@@ -47,7 +47,7 @@ class BaseSyncClient:
     def get_target_client(self):
         return self._target_client
 
-    def sync_job(self, batch_size):
+    def sync(self, batch_size):
         job_count = 0
         q = self._source_client.execute(self._extract_sql, True, True)
         while True:
