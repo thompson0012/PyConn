@@ -8,6 +8,6 @@ def tuple_to_dict(tuple_values, dict_key):
 
 def substitute_sql(template: str, values: List[Tuple], placeholder='{values}'):
     import re
-    return re.sub("(?<![\w\d\$]){placeholder}(?![\w\d\$])".format(placeholder=placeholder),
+    return re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder),
                   str(values)[1:-1],
                   template)
