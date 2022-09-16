@@ -26,3 +26,9 @@ def validate_opts_type(opts, type_):
     if isinstance(opts, type_):
         return True
     raise TypeError(f'{opts} should be {type_}')
+
+
+def validate_all_true(opts):
+    if all(opts):
+        return True
+    raise ValueError('not all opts are true')
