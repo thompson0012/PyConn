@@ -1,5 +1,6 @@
 from pyconn.client.db.base import BaseDBClient
 from pyconn.utils.db_utils import substitute_sql
+from pyconn.utils.validator import validate_all_true
 
 
 class BaseSyncDBClient:
@@ -47,19 +48,9 @@ class BaseSyncDBClient:
     def get_target_client(self):
         return self._target_client
 
-    def sync(self, batch_size):
-        job_count = 0
+    def run_extract_sql(self):
         q = self._source_client.execute(self._extract_sql, True, True)
-        while True:
+        return q
 
-            print(job_count)
-            rows = q.fetchmany(batch_size)
-
-            if bool(rows):
-                break
-            sub_sql = substitute_sql(self._load_sql,
-                                     rows)
-            self._target_client.execute(sub_sql, True, True)
-            job_count += 1
-
-        return
+    def sync(self, batch_size):
+        raise not NotImplementedError
