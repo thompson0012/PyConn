@@ -5,17 +5,20 @@ from pyconn.utils.db_utils import substitute_sql
 from pyconn.utils.validator import validate_all_true
 
 
-class IncrementalDBSyncClient(BaseSyncDBClient):
+class UpsertDBSyncClient(BaseSyncDBClient):
+    """
+    primary key must be present in database for the batch upsert
+    """
     def __init__(self, source_client=None, target_client=None):
-        super(IncrementalDBSyncClient, self).__init__(source_client, target_client)
-        self._can_incremental_sync = False
+        super(UpsertDBSyncClient, self).__init__(source_client, target_client)
+        self._can_upsert_sync = False
 
-    def _validate_incremental_sync(self):
+    def _validate_upsert_sync(self):
         validate_all_true([self._extract_sql, self._load_sql])
-        self._can_incremental_sync = True
+        self._can_upsert_sync = True
 
     def sync(self, batch_size):
-        validate_all_true([self._can_incremental_sync])
+        validate_all_true([self._can_upsert_sync])
         job_count = 0
         q = self.run_extract_sql()
         while True:
