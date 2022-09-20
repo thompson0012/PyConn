@@ -9,6 +9,7 @@ class UpsertDBSyncClient(BaseSyncDBClient):
     """
     primary key must be present in database for the batch upsert
     """
+
     def __init__(self, source_client=None, target_client=None):
         super(UpsertDBSyncClient, self).__init__(source_client, target_client)
         self._can_upsert_sync = False
@@ -29,7 +30,8 @@ class UpsertDBSyncClient(BaseSyncDBClient):
                 break
             sub_sql = substitute_sql(self._load_sql,
                                      rows)
-            print(sub_sql)
             self._target_client.execute(sub_sql, True, True)
             job_count += 1
+
+        print('total batch:', job_count)
         return
