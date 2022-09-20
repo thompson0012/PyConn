@@ -1,5 +1,7 @@
 import re
 from typing import List, Tuple
+import json
+import datetime
 
 
 def tuple_to_dict(tuple_values, dict_key):
@@ -16,3 +18,10 @@ def substitute_sql(template: str, values: List[Tuple], placeholder='{values}'):
 def remove_all_line_breaks(string: str):
     compiler = re.compile('/(\r\n)+|\r+|\n+|\t+/')
     return compiler.sub("", string)
+
+
+class ExtJsonEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
