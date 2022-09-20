@@ -27,6 +27,16 @@ class GCSClient(BaseLakeClient):
         super(GCSClient, self).__init__(lake_params)
         self._conn: Bucket
 
+    @classmethod
+    def from_credential_files(cls, lake_params: dict):
+        import os
+        import json
+        path = os.environ['GOOGLE_APPLICATION_CREDENTIALS']
+        s = open(path)
+        credentials = json.loads(s)
+        lake_params.update({'credentials': credentials})
+        return
+
     def connect(self):
         validate_keys(self.get_lake_params(), require=['bucket', 'credentials'])
         validate_keys(self.get_lake_params().get('credentials', {}),
