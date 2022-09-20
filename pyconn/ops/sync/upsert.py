@@ -18,17 +18,18 @@ class UpsertDBSyncClient(BaseSyncDBClient):
         self._can_upsert_sync = True
 
     def sync(self, batch_size):
+        self._validate_upsert_sync()
         validate_all_true([self._can_upsert_sync])
         job_count = 0
         q = self.run_extract_sql()
         while True:
 
-            print(job_count)
             rows = q.fetchmany(batch_size)
             if not bool(rows):
                 break
             sub_sql = substitute_sql(self._load_sql,
                                      rows)
+            print(sub_sql)
             self._target_client.execute(sub_sql, True, True)
             job_count += 1
         return
