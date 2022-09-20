@@ -11,3 +11,8 @@ def substitute_sql(template: str, values: List[Tuple], placeholder='{values}'):
     return re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder),
                   str(values)[1:-1],
                   template)
+
+
+def remove_all_line_breaks(string: str):
+    compiler = re.compile('/(\r\n)+|\r+|\n+|\t+/')
+    return compiler.sub("", string)
