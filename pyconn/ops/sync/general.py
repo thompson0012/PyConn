@@ -1,5 +1,5 @@
 from pyconn.ops.sync.base import BaseSyncDBClient
-from pyconn.utils.db_utils import substitute_sql
+from pyconn.utils.db_utils import substitute_sql, SqlResolver
 from pyconn.utils.validator import validate_all_true
 
 
@@ -22,8 +22,14 @@ class GeneralDBSyncClient(BaseSyncDBClient):
             rows = q.fetchmany(batch_size)
             if not bool(rows):
                 break
+
+            resolver = SqlResolver()
+            serialized_rows = resolver.serialize(rows)
+            resolved_rows = resolver.rewrite(serialized_rows)
+
             sub_sql = substitute_sql(self._load_sql,
-                                     rows)
+                                     resolved_rows)
+
             self._target_client.execute(sub_sql, True, True)
             job_count += 1
 
