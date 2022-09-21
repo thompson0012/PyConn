@@ -1,5 +1,5 @@
 from pyconn.ops.sync.base import BaseSyncDBClient
-from pyconn.utils.db_utils import substitute_sql, SqlResolver
+from pyconn.utils.db_utils import substitute_sql, SyncSqlResolver
 from pyconn.utils.validator import validate_all_true
 
 
@@ -23,7 +23,7 @@ class GeneralDBSyncClient(BaseSyncDBClient):
             if not bool(rows):
                 break
 
-            resolver = SqlResolver()
+            resolver = SyncSqlResolver.from_default()
             serialized_rows = resolver.serialize(rows)
             resolved_rows = resolver.rewrite(serialized_rows)
 

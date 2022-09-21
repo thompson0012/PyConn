@@ -29,19 +29,24 @@ class ExtJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class SqlResolver:
-    def __init__(self, encoder=None):
+class SyncSqlResolver:
+    def __init__(self, regex=None, encoder=None):
+        self._regex = regex
         self._encoder = encoder
+        self._regex_compiler = humre.compile(regex)
 
-    def serialize(self, obj):
+    @classmethod
+    def from_default(cls):
+        BRACKET_CONTENT_EXP = humre.OPEN_BRACKET + humre.ANYTHING + humre.CLOSE_BRACKET
+        return cls(regex=BRACKET_CONTENT_EXP, encoder=ExtJsonEncoder)
+
+    def serialize(self, obj) -> "json string":
         return json.dumps(obj, cls=self._encoder)
 
     def rewrite(self, json_str) -> str:
-        BRACKET_CONTENT_EXP = humre.OPEN_BRACKET + humre.ANYTHING + humre.CLOSE_BRACKET
-        compiler = humre.compile(BRACKET_CONTENT_EXP)
-        data_matched = compiler.findall(json_str[1:-1])
+        data_matched = self._regex_compiler.findall(json_str[1:-1])
 
-        def replace_bracket(obj):
+        def paren_first_last(obj):
             return '(' + obj[1:-1] + ')'
 
-        return ','.join(list(map(lambda x: replace_bracket(x), data_matched)))
+        return ','.join(list(map(lambda x: paren_first_last(x), data_matched)))
