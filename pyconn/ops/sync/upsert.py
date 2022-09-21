@@ -26,7 +26,7 @@ class UpsertDBSyncClient(BaseSyncDBClient):
             rows = q.fetchmany(batch_size)
             if not bool(rows):
                 break
-            resolver = SyncSqlResolver()
+            resolver = SyncSqlResolver.from_default()
             serialized_rows = resolver.serialize(rows)
             resolved_rows = resolver.rewrite(serialized_rows)
 
