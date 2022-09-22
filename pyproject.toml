@@ -15,6 +15,7 @@ pampy = "^0.3.0"
 Humre = "^0.2.0"
 pendulum = "^2.1.2"
 bson = "^0.5.10"
+orjson = "^3.8.0"
 
 [tool.poetry.dev-dependencies]
 google-cloud-storage = "^2.5.0"
