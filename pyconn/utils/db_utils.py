@@ -1,6 +1,7 @@
 import re
 from typing import List, Tuple
 import json
+import orjson
 import datetime
 import humre
 
@@ -41,7 +42,8 @@ class SyncSqlResolver:
         return cls(regex=BRACKET_CONTENT_EXP, encoder=ExtJsonEncoder)
 
     def serialize(self, obj) -> "json string":
-        return json.dumps(obj, cls=self._encoder)
+        # return json.dumps(obj, cls=self._encoder, ensure_ascii=False)
+        return orjson.dumps(obj, option=orjson.OPT_UTC_Z).decode('utf-8')
 
     def rewrite(self, json_str) -> str:
         data_matched = self._regex_compiler.findall(json_str[1:-1])
@@ -50,3 +52,17 @@ class SyncSqlResolver:
             return '(' + obj[1:-1] + ')'
 
         return ','.join(list(map(lambda x: paren_first_last(x), data_matched)))
+
+
+class SqlResolver2:
+    def __init__(self):
+        pass
+
+    def serialize(self, obj: list):
+
+        def serialized(obj: tuple):
+            string_ = orjson.dumps(obj, option=orjson.OPT_UTC_Z).decode('utf-8')
+            return '(' + string_[1:-1] + ')'
+        sql_container = [serialized(item) for item in obj]
+
+        return ','.join(sql_container)
