@@ -60,11 +60,12 @@ class SqlSchemaOnWrite:
         return schema
 
 
-class SqlConversionAdapter:
-    DEFAULT_DTYPE = (int, str, float, bool, bytes, complex)
-
-    def __init__(self, mapper=None):
+class BaseSqlTypeConvAdap:
+    def __init__(self, mapper):
         self._mapper = mapper
+
+    def get_mapper(self):
+        return self._mapper
 
     def register_mapper(self, val_type, handle_func):
         if not self._mapper:
@@ -74,8 +75,40 @@ class SqlConversionAdapter:
         return
 
     def init_default_mapper(self):
+        raise NotImplementedError
+
+    def parse(self, rows: List[Tuple]):
+        raise NotImplementedError
+
+
+class SqlTypeConverter(BaseSqlTypeConvAdap):
+    DEFAULT_DTYPE = (int, str, float, bool)
+
+    def __init__(self, mapper=None):
+        super(SqlTypeConverter, self).__init__(mapper)
+
+    def init_default_mapper(self):
         for i in self.DEFAULT_DTYPE:
             self.register_mapper(i, i)
+
+        self.register_mapper(None, lambda x: 'null')
+        return
+
+    def parse(self, rows: List[Tuple]):
+        pass
+
+
+class SqlTypeAdapter(BaseSqlTypeConvAdap):
+    DEFAULT_DTYPE = (int, str, float, bool, bytes, complex)
+
+    def __init__(self, mapper=None):
+        super(SqlTypeAdapter, self).__init__(mapper)
+
+    def init_default_mapper(self):
+        for i in self.DEFAULT_DTYPE:
+            self.register_mapper(i, i)
+
+        self.register_mapper(None, lambda x: 'null')
         return
 
     def parse(self, rows: List[Tuple]):
