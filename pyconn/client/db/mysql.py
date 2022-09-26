@@ -2,7 +2,7 @@ from pyconn.client.db.base import BaseDBClient
 import aiomysql
 import pymysql
 from typing import List, Callable
-from pyconn.utils.db_utils import tuple_to_dict
+from pyconn.utils.db_utils import tuple_to_dict, SqlTypeConverter
 from pyconn.utils.validator import validate_opts_value, validate_opts_type
 
 
@@ -21,8 +21,10 @@ class MySQLClient(BaseDBClient):
         validate_opts_type(handler_func, Callable)
 
         conversions = self._db_params.get('conv', pymysql.converters.conversions)
-        conversions[value_type] = handler_func
-        self._db_params.update({'conv': conversions})
+        converter = SqlTypeConverter(conversions)
+        # conversions[value_type] = handler_func
+        converter.register_mapper(value_type, handler_func)
+        self._db_params.update({'conv': converter.get_mapper()})
         return
 
     def init_default_conv(self):
