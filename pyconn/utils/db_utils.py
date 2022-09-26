@@ -54,11 +54,11 @@ class SyncSqlResolver:
         return ','.join(list(map(lambda x: paren_first_last(x), data_matched)))
 
 
-class SqlResolver2:
+class SqlBatchJoiner:
     def __init__(self):
         pass
 
-    def serialize(self, obj: list):
+    def serialize_join(self, obj: list):
 
         def serialized(obj: tuple):
             string_ = orjson.dumps(obj, option=orjson.OPT_UTC_Z).decode('utf-8')

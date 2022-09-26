@@ -1,7 +1,7 @@
 from pyconn.client.db.base import BaseDBClient
 from pyconn.ops.sync.base import BaseSyncDBClient
 from pyconn.utils.validator import validate_all_true
-from pyconn.utils.db_utils import substitute_sql, SyncSqlResolver, SqlResolver2
+from pyconn.utils.db_utils import substitute_sql, SqlBatchJoiner
 
 
 class FullDBSyncClient(BaseSyncDBClient):
@@ -38,7 +38,7 @@ class FullDBSyncClient(BaseSyncDBClient):
             # resolver = SyncSqlResolver.from_default()
             # serialized_rows = resolver.serialize(rows)
             # resolved_rows = resolver.rewrite(serialized_rows)
-            resolved_rows = SqlResolver2().serialize(rows)
+            resolved_rows = SqlBatchJoiner().serialize_join(rows)
 
             sub_sql = substitute_sql(self._load_sql,
                                      resolved_rows)
