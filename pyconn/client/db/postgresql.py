@@ -18,11 +18,7 @@ class PostgresSQLClient(BaseDBClient):
         return self
 
     def execute(self, sql, keep_alive=False, commit=True):
-        # should add auto-infer sql action
-        # read = False
-        # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
-        # if len(compiler.findall(sql)) == 0:
-        #     read = True
+
         if keep_alive:
             q = self._cursor.execute(sql)
             if commit:

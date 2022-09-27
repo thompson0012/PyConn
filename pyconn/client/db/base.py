@@ -38,6 +38,9 @@ class BaseDBClient(ABC):
     def register_conv(self, value_type, handler_func: Callable):
         raise NotImplementedError
 
+    def init_default_conv(self):
+        raise NotImplementedError
+
     def connect(self) -> "BaseDBClient":
         raise NotImplementedError
 

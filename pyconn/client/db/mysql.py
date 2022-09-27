@@ -11,7 +11,7 @@ class MySQLClient(BaseDBClient):
         super(MySQLClient, self).__init__(db_params)
 
     def register_adapt(self, value_type, handler_func: Callable):
-        validate_opts_type(value_type, pymysql.FIELD_TYPE)
+        validate_opts_type(value_type, int)
         validate_opts_type(handler_func, Callable)
 
         raise NotImplementedError
@@ -43,11 +43,7 @@ class MySQLClient(BaseDBClient):
         return self
 
     def execute(self, sql, keep_alive=False, commit=True):
-        # should add auto-infer sql action
-        # read = False
-        # compiler = humre.compile("(?<![\w\d])create|insert|update|delete|drop|alter(?![\w\d])", IGNORECASE=True)
-        # if len(compiler.findall(sql)) == 0:
-        #     read = True
+
         if keep_alive:
             q = self._cursor.execute(sql)
             if commit:
