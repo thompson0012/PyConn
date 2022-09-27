@@ -4,6 +4,7 @@ import json
 import orjson
 import datetime
 import humre
+from types import NoneType
 from pyconn.utils.validator import validate_opts_value, validate_opts_type
 
 
@@ -91,11 +92,22 @@ class SqlTypeConverter(BaseSqlTypeConvAdap):
         for i in self.DEFAULT_DTYPE:
             self.register_mapper(i, i)
 
-        self.register_mapper(None, lambda x: 'null')
+        self.register_mapper(NoneType, lambda x: 'null')
         return
 
     def parse(self, rows: List[Tuple]):
-        pass
+        validate_opts_type(rows, list)
+        validate_opts_type(rows[0], tuple)
+
+        def col_adapt(col):
+            if isinstance(col, self.DEFAULT_DTYPE):
+                return col
+            return self._mapper[type(col)](col)
+
+        def row_adapt(row):
+            return map(col_adapt, row)
+
+        return tuple(map(row_adapt, rows))
 
 
 class SqlTypeAdapter(BaseSqlTypeConvAdap):
@@ -108,23 +120,12 @@ class SqlTypeAdapter(BaseSqlTypeConvAdap):
         for i in self.DEFAULT_DTYPE:
             self.register_mapper(i, i)
 
-        self.register_mapper(None, lambda x: 'null')
+        self.register_mapper(NoneType, lambda x: 'null')
         return
 
     def parse(self, rows: List[Tuple]):
         validate_opts_type(rows, list)
         validate_opts_type(rows[0], tuple)
-
-        # rows_record = []
-        # for row in rows:
-        #     row_record = []
-        #     for i, col in enumerate(row):
-        #         if isinstance(col, self.DEFAULT_DTYPE):
-        #             row_record.append(col)
-        #             continue
-        #         row_record.append(self._mapper[type(col)](col))
-        #
-        #     rows_record.append(tuple(row_record))
 
         def col_adapt(col):
             if isinstance(col, self.DEFAULT_DTYPE):
@@ -132,7 +133,7 @@ class SqlTypeAdapter(BaseSqlTypeConvAdap):
             return self._mapper[type(col)](col)
 
         def row_adapt(row):
-            return tuple(map(col_adapt, row))
+            return map(col_adapt, row)
 
         return tuple(map(row_adapt, rows))
 
