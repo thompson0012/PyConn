@@ -27,10 +27,7 @@ class UpsertDBSyncClient(BaseSyncDBClient):
             if not bool(rows):
                 break
 
-            # resolver = SyncSqlResolver.from_default()
-            # serialized_rows = resolver.serialize(rows)
-            # resolved_rows = resolver.rewrite(serialized_rows)
-            resolved_rows = SqlBatchJoiner().serialize_join(rows)
+            resolved_rows = SqlBatchJoiner().join(rows, 'jsonify')
 
             sub_sql = substitute_sql(self._load_sql,
                                      resolved_rows)
