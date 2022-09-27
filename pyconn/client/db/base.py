@@ -32,9 +32,6 @@ class BaseDBClient(ABC):
         db_params.update(**kwargs)
         return cls(db_params.to_dict())
 
-    def register_adapt(self, value_type, handler_func: Callable):
-        raise NotImplementedError
-
     def register_conv(self, value_type, handler_func: Callable):
         raise NotImplementedError
 

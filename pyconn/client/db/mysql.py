@@ -10,12 +10,6 @@ class MySQLClient(BaseDBClient):
     def __init__(self, db_params):
         super(MySQLClient, self).__init__(db_params)
 
-    def register_adapt(self, value_type, handler_func: Callable):
-        validate_opts_type(value_type, int)
-        validate_opts_type(handler_func, Callable)
-
-        raise NotImplementedError
-
     def register_conv(self, value_type, handler_func: Callable):
         validate_opts_type(value_type, int)
         validate_opts_type(handler_func, Callable)
