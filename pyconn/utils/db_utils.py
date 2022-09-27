@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple
+from typing import List, Tuple, Optional, Dict
 import json
 import orjson
 import datetime
@@ -84,7 +84,7 @@ class BaseSqlTypeConvAdap:
 class SqlTypeConverter(BaseSqlTypeConvAdap):
     DEFAULT_DTYPE = (int, str, float, bool)
 
-    def __init__(self, mapper=None):
+    def __init__(self, mapper: Optional[Dict] = None):
         super(SqlTypeConverter, self).__init__(mapper)
 
     def init_default_mapper(self):
@@ -115,15 +115,24 @@ class SqlTypeAdapter(BaseSqlTypeConvAdap):
         validate_opts_type(rows, list)
         validate_opts_type(rows[0], tuple)
 
-        rows_record = []
-        for row in rows:
-            row_record = []
-            for i, col in enumerate(row):
-                if isinstance(col, self.DEFAULT_DTYPE):
-                    row_record.append(col)
-                    continue
-                row_record.append(self._mapper[type(col)](col))
+        # rows_record = []
+        # for row in rows:
+        #     row_record = []
+        #     for i, col in enumerate(row):
+        #         if isinstance(col, self.DEFAULT_DTYPE):
+        #             row_record.append(col)
+        #             continue
+        #         row_record.append(self._mapper[type(col)](col))
+        #
+        #     rows_record.append(tuple(row_record))
 
-            rows_record.append(tuple(row_record))
+        def col_adapt(col):
+            if isinstance(col, self.DEFAULT_DTYPE):
+                return col
+            return self._mapper[type(col)](col)
 
-        return rows_record
+        def row_adapt(row):
+            return tuple(map(col_adapt, row))
+
+        return tuple(map(row_adapt, rows))
+
