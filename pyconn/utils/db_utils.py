@@ -12,7 +12,7 @@ def tuple_to_dict(tuple_values, dict_key):
     return dict(zip(dict_key, tuple_values))
 
 
-def substitute_sql(template: str, values: str, placeholder='{values}'):
+def substitute_sql(template: str, values: str, placeholder='{{values}}'):
     import re
     # return re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder),
     #               str(values)[1:-1],
@@ -36,14 +36,36 @@ class SqlBatchJoiner:
     def __init__(self):
         pass
 
-    def serialize_join(self, obj: list):
-        def serialized(obj: tuple):
+    def stringify_join(self, obj: tuple | list):
+        from functools import reduce
+
+        def row_adapt(row: tuple):
+            if len(row) == 1:
+                return re.sub(',', '', str(row))
+            else:
+                return str(row)
+
+        return reduce(lambda a, b: ','.join([a, b]), map(row_adapt, obj))
+
+    def jsonify_join(self, obj: tuple | list):
+        def serialized(obj):
             string_ = orjson.dumps(obj, option=orjson.OPT_UTC_Z).decode('utf-8')
             return '(' + string_[1:-1] + ')'
 
         sql_container = [serialized(item) for item in obj]
 
         return ','.join(sql_container)
+
+    def join(self, obj, method: str):
+        match method:
+            case 'stringify':
+                return self.stringify_join(obj)
+
+            case 'jsonify':
+                return self.jsonify_join(obj)
+
+            case _:
+                raise ValueError('not supported')
 
 
 class SqlSchemaOnWrite:
@@ -78,6 +100,12 @@ class BaseSqlTypeConvAdap:
     def init_default_mapper(self):
         raise NotImplementedError
 
+    @classmethod
+    def from_default_mapper(cls):
+        adapt = cls()
+        adapt.init_default_mapper()
+        return adapt
+
     def parse(self, rows: List[Tuple]):
         raise NotImplementedError
 
@@ -96,7 +124,7 @@ class SqlTypeConverter(BaseSqlTypeConvAdap):
         return
 
     def parse(self, rows: List[Tuple]):
-        validate_opts_type(rows, list)
+        validate_opts_type(rows, (tuple, list))
         validate_opts_type(rows[0], tuple)
 
         def col_adapt(col):
@@ -124,7 +152,7 @@ class SqlTypeAdapter(BaseSqlTypeConvAdap):
         return
 
     def parse(self, rows: List[Tuple]):
-        validate_opts_type(rows, list)
+        validate_opts_type(rows, (tuple, list))
         validate_opts_type(rows[0], tuple)
 
         def col_adapt(col):
@@ -133,7 +161,6 @@ class SqlTypeAdapter(BaseSqlTypeConvAdap):
             return self._mapper[type(col)](col)
 
         def row_adapt(row):
-            return map(col_adapt, row)
+            return tuple(map(col_adapt, row))
 
         return tuple(map(row_adapt, rows))
-
