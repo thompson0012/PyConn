@@ -1,12 +1,13 @@
 from pyconn.client.db.base import BaseDBClient
-from pyconn.utils.db_utils import substitute_sql
-from pyconn.utils.validator import validate_all_true
+from pyconn.utils.db_utils import SqlTypeAdapter
 
 
 class BaseSyncDBClient:
-    def __init__(self, source_client=None, target_client=None):
+    def __init__(self, source_client=None, target_client=None, encode='stringify'):
         self._source_client: BaseDBClient = source_client
         self._target_client: BaseDBClient = target_client
+        self._encode = encode
+        self._type_adapter: SqlTypeAdapter = None
 
         self._extract_sql = None
         self._load_sql = None
@@ -18,6 +19,10 @@ class BaseSyncDBClient:
 
     def register_target(self, client: BaseDBClient):
         self._target_client = client
+        return
+
+    def register_type_adapter(self, adapter: SqlTypeAdapter):
+        self._type_adapter = adapter
         return
 
     def connect_all(self):
