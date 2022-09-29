@@ -1,7 +1,8 @@
 from pyconn.client.db.base import BaseDBClient
 from pyconn.ops.sync.base import BaseSyncDBClient
 from pyconn.utils.validator import validate_all_true
-from pyconn.utils.db_utils import substitute_sql, SqlBatchJoiner
+from pyconn.utils.db_utils import substitute_sql, SqlBatchJoiner, SqlTypeAdapter
+import re
 
 
 class FullDBSyncClient(BaseSyncDBClient):
@@ -9,8 +10,8 @@ class FullDBSyncClient(BaseSyncDBClient):
     full database sync, required to have dropped / create statement for table manipulation
     """
 
-    def __init__(self, source_client=None, target_client=None):
-        super(FullDBSyncClient, self).__init__(source_client, target_client)
+    def __init__(self, source_client=None, target_client=None, encode='stringify'):
+        super(FullDBSyncClient, self).__init__(source_client, target_client, encode)
         self._drop_sql = None
         self._create_sql = None
 
@@ -30,12 +31,12 @@ class FullDBSyncClient(BaseSyncDBClient):
         self.get_target_client().execute(self._create_sql, keep_alive=True, commit=True)
         while True:
 
-            print(job_count)
             rows = q.fetchmany(batch_size)
             if not bool(rows):
                 break
 
-            resolved_rows = SqlBatchJoiner().join(rows, 'jsonify')
+            rows = self._type_adapter.parse(rows)
+            resolved_rows = SqlBatchJoiner().join(rows, self._encode)
 
             sub_sql = substitute_sql(self._load_sql,
                                      resolved_rows)

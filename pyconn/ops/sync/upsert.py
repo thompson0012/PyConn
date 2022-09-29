@@ -1,15 +1,15 @@
 from pyconn.ops.sync.base import BaseSyncDBClient
 from pyconn.utils.db_utils import substitute_sql, SqlBatchJoiner
 from pyconn.utils.validator import validate_all_true
-
+import re
 
 class UpsertDBSyncClient(BaseSyncDBClient):
     """
     primary key must be present in database for the batch upsert
     """
 
-    def __init__(self, source_client=None, target_client=None):
-        super(UpsertDBSyncClient, self).__init__(source_client, target_client)
+    def __init__(self, source_client=None, target_client=None, encode='stringify'):
+        super(UpsertDBSyncClient, self).__init__(source_client, target_client, encode)
         self._can_upsert_sync = False
 
     def _validate_upsert_sync(self):
@@ -27,12 +27,12 @@ class UpsertDBSyncClient(BaseSyncDBClient):
             if not bool(rows):
                 break
 
-            resolved_rows = SqlBatchJoiner().join(rows, 'jsonify')
+            rows = self._type_adapter.parse(rows)
+            resolved_rows = SqlBatchJoiner().join(rows, self._encode)
 
             sub_sql = substitute_sql(self._load_sql,
                                      resolved_rows)
             self._target_client.execute(sub_sql, True, True)
             job_count += 1
 
-        print('total batch:', job_count)
         return
