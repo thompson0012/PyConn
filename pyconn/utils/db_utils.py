@@ -26,13 +26,6 @@ def remove_all_line_breaks(string: str):
     return compiler.sub("", string)
 
 
-class ExtJsonEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
-
-
 class SqlJoiner:
     def __init__(self):
         pass
