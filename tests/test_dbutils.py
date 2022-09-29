@@ -21,7 +21,7 @@ class DbUtilsTestCase(unittest.TestCase):
         adapter.register_mapper(datetime, lambda x: str(x))
         parsed_dummy_data = adapter.parse(self.dummy_data)
 
-        joiner = SqlBatchJoiner()
+        joiner = SqlJoiner()
         str_joined_dummy_data = joiner.join(parsed_dummy_data, 'stringify')
 
         json_joined_dummy_data = joiner.join(parsed_dummy_data, 'jsonify')
@@ -30,23 +30,21 @@ class DbUtilsTestCase(unittest.TestCase):
     def test_func_substitute_sql(self):
         adapter = SqlTypeAdapter.from_default_mapper()
         adapter.register_mapper(datetime, lambda x: str(x))
-        adapter.register_mapper(type(None), lambda x: '`null`')
         parsed_dummy_data = adapter.parse(self.dummy_data)
-        joined_dummy_data = SqlBatchJoiner().join(parsed_dummy_data, 'stringify')
-        inject_template = 'insert into test_sync (id, truefalse) values {{values}}'
-        inject_values = joined_dummy_data
 
-        def substitute_sql(template: str, values: str, placeholder='{{values}}'):
-            import re
-            # return re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder),
-            #               str(values)[1:-1],
-            #               template)
-            sub_placeholder_sql = re.sub("(?<![\w\d]){{values}}(?![\w\d])", values,
-                                         template)
-            return re.sub('`null`', 'null', sub_placeholder_sql)
+        joined_dummy_data = SqlJoiner().join(parsed_dummy_data, 'stringify')
+        joined_dummy_data_json = SqlJoiner().join(parsed_dummy_data, 'jsonify')
+
+        inject_template = 'insert into test_sync (id, truefalse) values {{values}}'
+
+        inject_values = joined_dummy_data
+        inject_values_json = joined_dummy_data_json
 
         substituted_sql = substitute_sql(inject_template, inject_values)
-        print(substituted_sql)
+
+
+
+
 
 
 if __name__ == '__main__':
