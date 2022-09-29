@@ -12,6 +12,8 @@ def tuple_to_dict(tuple_values, dict_key):
     return dict(zip(dict_key, tuple_values))
 
 
+# I think there have another smart way to substitute the sql
+# SQL injection should only be occurred when user operates in something that is not author's original intend
 def substitute_sql(template: str, values: str, placeholder='{{values}}', null_handle=True):
     sub_sql = re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder), values, template)
     if null_handle:
