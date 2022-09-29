@@ -109,34 +109,6 @@ class BaseSqlTypeConvAdap:
         raise NotImplementedError
 
 
-class SqlTypeConverter(BaseSqlTypeConvAdap):
-    DEFAULT_DTYPE = (int, str, float, bool)
-
-    def __init__(self, mapper: Optional[Dict] = None):
-        super(SqlTypeConverter, self).__init__(mapper)
-
-    def init_default_mapper(self):
-        for i in self.DEFAULT_DTYPE:
-            self.register_mapper(i, i)
-
-        self.register_mapper(NoneType, lambda x: 'null')
-        return
-
-    def parse(self, rows: List[Tuple]):
-        validate_opts_type(rows, (tuple, list))
-        validate_opts_type(rows[0], tuple)
-
-        def col_adapt(col):
-            if isinstance(col, self.DEFAULT_DTYPE):
-                return col
-            return self._mapper[type(col)](col)
-
-        def row_adapt(row):
-            return map(col_adapt, row)
-
-        return tuple(map(row_adapt, rows))
-
-
 class SqlTypeAdapter(BaseSqlTypeConvAdap):
     DEFAULT_DTYPE = (int, str, float, bool, bytes, complex)
 
