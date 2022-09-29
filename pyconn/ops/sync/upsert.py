@@ -1,5 +1,5 @@
 from pyconn.ops.sync.base import BaseSyncDBClient
-from pyconn.utils.db_utils import substitute_sql, SqlBatchJoiner
+from pyconn.utils.db_utils import substitute_sql, SqlJoiner
 from pyconn.utils.validator import validate_all_true
 import re
 
@@ -28,7 +28,7 @@ class UpsertDBSyncClient(BaseSyncDBClient):
                 break
 
             rows = self._type_adapter.parse(rows)
-            resolved_rows = SqlBatchJoiner().join(rows, self._encode)
+            resolved_rows = SqlJoiner().join(rows, self._encode)
 
             sub_sql = substitute_sql(self._load_sql,
                                      resolved_rows)

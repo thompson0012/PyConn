@@ -31,7 +31,7 @@ class ExtJsonEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-class SqlBatchJoiner:
+class SqlJoiner:
     def __init__(self):
         pass
 
