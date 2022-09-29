@@ -14,8 +14,14 @@ def tuple_to_dict(tuple_values, dict_key):
 
 # I think there have another smart way to substitute the sql
 # SQL injection should only be occurred when user operates in something that is not author's original intend
+
+def substitute_string(template: str, values: str, placeholder='{{values}}'):
+    sub_string = re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder), values, template)
+    return sub_string
+
+
 def substitute_sql(template: str, values: str, placeholder='{{values}}', null_handle=True):
-    sub_sql = re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder), values, template)
+    sub_sql = substitute_string(template, values, placeholder)
     if null_handle:
         return re.sub("'null'", "null", sub_sql)
     return sub_sql
@@ -30,7 +36,8 @@ class SqlJoiner:
     def __init__(self):
         pass
 
-    def stringify_join(self, obj: tuple | list):
+    @classmethod
+    def stringify_join(cls, obj: tuple | list):
         from functools import reduce
 
         def row_adapt(row: tuple):
@@ -41,7 +48,8 @@ class SqlJoiner:
 
         return reduce(lambda a, b: ','.join([a, b]), map(row_adapt, obj))
 
-    def jsonify_join(self, obj: tuple | list):
+    @classmethod
+    def jsonify_join(cls, obj: tuple | list):
         def serialized(obj):
             string_ = orjson.dumps(obj, option=orjson.OPT_UTC_Z).decode('utf-8')
             return '(' + string_[1:-1] + ')'
@@ -50,13 +58,14 @@ class SqlJoiner:
 
         return ','.join(sql_container)
 
-    def join(self, obj, method: str):
+    @classmethod
+    def join(cls, obj, method: str):
         match method:
             case 'stringify':
-                return self.stringify_join(obj)
+                return cls.stringify_join(obj)
 
             case 'jsonify':
-                return self.jsonify_join(obj)
+                return cls.jsonify_join(obj)
 
             case _:
                 raise ValueError('not supported')
@@ -84,11 +93,11 @@ class BaseSqlTypeConvAdap:
     def get_mapper(self):
         return self._mapper
 
-    def register_mapper(self, val_type, handle_func):
+    def register_mapper(self, type_, handler_func):
         if not self._mapper:
             self._mapper = {}
 
-        self._mapper[val_type] = handle_func
+        self._mapper[type_] = handler_func
         return
 
     def init_default_mapper(self):
