@@ -1,7 +1,7 @@
 from pyconn.client.db.base import BaseDBClient
 import sqlite3
 from typing import List, Callable
-from pyconn.utils.db_utils import tuple_to_dict, SqlTypeConverter
+from pyconn.utils.db_utils import tuple_to_dict
 from pyconn.utils.validator import validate_opts_value
 
 
