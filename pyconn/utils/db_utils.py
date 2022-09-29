@@ -12,12 +12,11 @@ def tuple_to_dict(tuple_values, dict_key):
     return dict(zip(dict_key, tuple_values))
 
 
-def substitute_sql(template: str, values: str, placeholder='{{values}}'):
-    import re
-    # return re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder),
-    #               str(values)[1:-1],
-    #               template)
-    return re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder), values, template)
+def substitute_sql(template: str, values: str, placeholder='{{values}}', null_handle=True):
+    sub_sql = re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder), values, template)
+    if null_handle:
+        return re.sub("'null'", "null", sub_sql)
+    return sub_sql
 
 
 def remove_all_line_breaks(string: str):
