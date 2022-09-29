@@ -30,6 +30,8 @@ class BaseExporter:
         self._adapter: SqlTypeAdapter = adapter
 
     def register_mapper(self, type_, handler_func):
+        if not self._adapter:
+            self._adapter = SqlTypeAdapter.from_default_mapper()
         return self._adapter.register_mapper(type_, handler_func)
 
     def write_to_file(self, filename, obj, col):
