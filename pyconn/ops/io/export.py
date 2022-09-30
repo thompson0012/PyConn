@@ -2,24 +2,27 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import orjson
 from typing import List, Tuple, Dict, Optional
-from pyconn.utils.db_utils import SqlJoiner, SqlTypeAdapter
+from pyconn.utils.db_utils import SqlJoiner, SqlTypeAdapter, SqlSchemaOnWrite
 import csv
 
 
 class DBExportController:
-    def __init__(self):
-        pass
+    def __init__(self, format_):
+        self._format = format_
 
+    def export(self, filename, obj, col):
+        match self._format:
+            case 'csv':
+                return CsvExporter().write_to_file(filename, obj, col)
 
-class DtypeConverter:
-    def __init__(self, source: str):
-        self._source = source  # mysql, sqlite, postgresql
+            case 'parquet':
+                return ParquetExporter().write_to_file(filename, obj, col)
 
-    def _init_convert_engine(self):
-        pass
+            case 'json':
+                return JsonExporter().write_to_file(filename, obj, col)
 
-    def convert(self):
-        pass
+            case _:
+                raise ValueError('not supported')
 
 
 class BaseExporter:
@@ -41,6 +44,9 @@ class BaseExporter:
 class ParquetExporter(BaseExporter):
     def __init__(self):
         super(ParquetExporter, self).__init__()
+
+    def write_to_file(self, filename, obj, col):
+        list(zip(*obj))
 
 
 class CsvExporter(BaseExporter):
