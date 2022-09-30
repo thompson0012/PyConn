@@ -27,6 +27,29 @@ def substitute_sql(template: str, values: str, placeholder='{{values}}', null_ha
     return sub_sql
 
 
+class SqlRewriter:
+    def __init__(self, rewrite_mapper=None):
+        self._mapper = rewrite_mapper
+
+    def register_rewrite_mapper(self, pattern, repl):
+        if not self._mapper:
+            self._mapper = {}
+
+        self._mapper[pattern] = repl
+        return
+
+    def validate_mapper(self):
+        validate_opts_type(self._mapper, Dict)
+
+    def rewrite(self, template):
+        rewrote_sql = None
+        for k, v in self._mapper.items():
+            print(k, v)
+            rewrote_sql = re.sub(k, v, template)
+            print(rewrote_sql)
+        return rewrote_sql
+
+
 def remove_all_line_breaks(string: str):
     compiler = re.compile('/(\r\n)+|\r+|\n+|\t+/')
     return compiler.sub("", string)
