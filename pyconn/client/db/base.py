@@ -62,7 +62,7 @@ class BaseDBClient(ABC):
     def show_table_ddl(self, tbl_name):
         raise NotImplementedError
 
-    def close_conn(self):
+    def disconnect(self):
         self._cursor.close()
         self._conn.close()
         return

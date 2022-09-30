@@ -31,8 +31,8 @@ class BaseSyncDBClient:
         return
 
     def close_all(self):
-        self._source_client.close_conn()
-        self._target_client.close_conn()
+        self._source_client.disconnect()
+        self._target_client.disconnect()
         return
 
     def register_extract_sql(self, sql):

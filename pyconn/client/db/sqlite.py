@@ -47,7 +47,7 @@ class SQLiteClient(BaseDBClient):
             self._conn.rollback()
 
         finally:
-            self.close_conn()
+            self.disconnect()
 
     def show_table_schema(self, tbl_name):
         data = self.execute(f'pragma table_info({tbl_name})', keep_alive=True).fetchall()

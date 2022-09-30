@@ -49,7 +49,7 @@ class PostgresSQLClient(BaseDBClient):
             self._conn.rollback()
 
         finally:
-            self.close_conn()
+            self.disconnect()
 
 
 class AsyncPostgresSQLClient(PostgresSQLClient):
