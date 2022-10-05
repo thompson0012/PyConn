@@ -42,11 +42,10 @@ class SqlRewriter:
         validate_opts_type(self._mapper, Dict)
 
     def rewrite(self, template):
-        rewrote_sql = None
+        rewrote_sql = template
         for k, v in self._mapper.items():
-            print(k, v)
-            rewrote_sql = re.sub(k, v, template)
-            print(rewrote_sql)
+            rewrote_sql = re.sub(k, v, rewrote_sql)
+
         return rewrote_sql
 
 
