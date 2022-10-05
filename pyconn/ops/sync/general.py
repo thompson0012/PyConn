@@ -1,6 +1,6 @@
 import re
 from pyconn.ops.sync.base import BaseSyncDBClient
-from pyconn.utils.db_utils import substitute_sql, SqlJoiner
+from pyconn.utils.db_utils import substitute_sql, SqlJoiner, SqlRewriter
 from pyconn.utils.validator import validate_all_true
 
 
@@ -26,10 +26,12 @@ class GeneralDBSyncClient(BaseSyncDBClient):
             rows = self._type_adapter.parse(rows)
             resolved_rows = SqlJoiner().join(rows, self._encode)
 
-            sub_sql = substitute_sql(self._load_sql,
-                                     resolved_rows)
+            rewriter = SqlRewriter()
+            rewriter.register_rewrite_mapper("(?<![\w\d]){{values}}(?![\w\d])", resolved_rows)
+            rewriter.register_rewrite_mapper(*list(self._NULL_REPLACE.items())[0])
+            rewrote_sql = rewriter.rewrite(self._load_sql)
 
-            self._target_client.execute(sub_sql, True, True)
+            self._target_client.execute(rewrote_sql, True, True)
             job_count += 1
 
         return

@@ -1,13 +1,18 @@
 from pyconn.client.db.base import BaseDBClient
 from pyconn.utils.db_utils import SqlTypeAdapter
+from typing import Optional
 
 
 class BaseSyncDBClient:
+    JSONIFY_NULL = {'"null"': 'null'}
+    STRINGIFY_NULL = {"'null'": 'null'}
+
     def __init__(self, source_client=None, target_client=None, encode='stringify'):
         self._source_client: BaseDBClient = source_client
         self._target_client: BaseDBClient = target_client
         self._encode = encode
-        self._type_adapter: SqlTypeAdapter = None
+        self._NULL_REPLACE = self.STRINGIFY_NULL if self._encode == 'stringify' else self.JSONIFY_NULL
+        self._type_adapter: Optional[SqlTypeAdapter] = None
 
         self._extract_sql = None
         self._load_sql = None
