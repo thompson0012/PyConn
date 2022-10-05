@@ -1,3 +1,4 @@
+import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import orjson
@@ -46,7 +47,10 @@ class ParquetExporter(BaseExporter):
         super(ParquetExporter, self).__init__()
 
     def write_to_file(self, filename, obj, col):
-        list(zip(*obj))
+        col_data = list(zip(*obj))
+        parquet_table = pa.table(dict(zip(col, col_data)))
+        pq.write_table(parquet_table, filename)
+        return
 
 
 class CsvExporter(BaseExporter):
