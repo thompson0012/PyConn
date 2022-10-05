@@ -35,7 +35,7 @@ class GCSClient(BaseLakeClient):
         s = open(path)
         credentials = json.loads(s)
         lake_params.update({'credentials': credentials})
-        return
+        return cls(lake_params)
 
     def connect(self):
         validate_keys(self.get_lake_params(), require=['bucket', 'credentials'])
