@@ -82,8 +82,8 @@ client.connect()
 from pyconn.api import UpsertDBSyncClient
 from pyconn.api import MySQLClient, SQLiteClient
 
-mc = MySQLClient.from_kv()
-sc = SQLiteClient.from_kv()
+client = MySQLClient.from_kv(database='test', host='localhost', port=3306, user='admin', password='admin')
+sc = SQLiteClient.from_kv(database='./test.db')
 
 client = UpsertDBSyncClient()
 client.register_source(sc)
@@ -93,7 +93,31 @@ client.register_extract_sql('select id,name,password from test_sync')
 client.sync(100)
 ```
 
-4. database io
+4. database io, and type adapter
+
+```python
+from pyconn.api import ParquetExporter, JsonExporter, CsvExporter
+from pyconn.api import MySQLClient
+from datetime import datetime
+
+client = MySQLClient.from_kv(database='test', host='localhost', port=3306, user='admin', password='admin')
+client.connect()
+
+q = client.execute('select * from test_sync', keep_alive=True)
+rows = q.fetchall()
+
+exporter = JsonExporter()
+exporter.write_to_file('rows.json', rows, ['id', 'name', 'password'])
+
+exporter = CsvExporter()
+exporter.register_mapper(datetime, lambda x: str(x))
+exporter.write_to_file('rows.csv', rows, ['id', 'name', 'password'])
+
+exporter = ParquetExporter()
+exporter.write_to_file('rows.parquet', rows, ['id', 'name', 'password'])
+```
+
 
 # development progress
+for the release notes and development progress, pls find the [following files](./release notes.md)
 
