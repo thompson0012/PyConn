@@ -1,4 +1,4 @@
-0.1.2
+0.1.2 current progress
 - enhancement on database IO
 - database sync to data lake
 - orm framework support
