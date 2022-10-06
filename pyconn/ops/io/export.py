@@ -12,7 +12,7 @@ class DBExportController:
     def __init__(self, format_):
         self._format = format_
 
-    def export(self, filename, obj, col):
+    def export_to_file(self, filename, obj, col):
         match self._format:
             case 'csv':
                 return CsvExporter().write_to_file(filename, obj, col)
@@ -23,6 +23,17 @@ class DBExportController:
             case 'json':
                 return JsonExporter().write_to_file(filename, obj, col)
 
+            case _:
+                raise ValueError('not supported')
+
+    def export_to_memory(self, obj, col):
+        match self._format:
+            case 'csv':
+                return CsvExporter().writer_to_memory(obj, col)
+            case 'parquet':
+                return ParquetExporter().writer_to_memory(obj, col)
+            case 'json':
+                return JsonExporter().writer_to_memory(obj, col)
             case _:
                 raise ValueError('not supported')
 
