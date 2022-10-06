@@ -1,5 +1,7 @@
 0.1.2
-- in progress, planning
+- enhancement on database IO
+- database sync to data lake
+- orm framework support
 
 0.1.1
 - database utils
