@@ -5,6 +5,7 @@ import orjson
 from typing import List, Tuple, Dict, Optional
 from pyconn.utils.db_utils import SqlJoiner, SqlTypeAdapter, SqlSchemaOnWrite
 import csv
+import io
 
 
 class DBExportController:
@@ -38,7 +39,17 @@ class BaseExporter:
             self._adapter = SqlTypeAdapter.from_default_mapper()
         return self._adapter.register_mapper(type_, handler_func)
 
+    def serialize(self, obj):
+        if not self._adapter:
+            self._adapter = SqlTypeAdapter.from_default_mapper()
+            self._adapter.register_mapper(type(None), lambda x: None)
+
+        return self._adapter.parse(obj)
+
     def write_to_file(self, filename, obj, col):
+        raise NotImplementedError
+
+    def writer_to_memory(self, obj, col):
         raise NotImplementedError
 
 
@@ -52,6 +63,14 @@ class ParquetExporter(BaseExporter):
         pq.write_table(parquet_table, filename)
         return
 
+    def writer_to_memory(self, obj, col):
+        sink = pa.BufferOutputStream()
+
+        col_data = list(zip(*obj))
+        parquet_table = pa.table(dict(zip(col, col_data)))
+        pq.write_table(parquet_table, sink)
+        return sink.getvalue()
+
 
 class CsvExporter(BaseExporter):
     def __init__(self):
@@ -63,12 +82,17 @@ class CsvExporter(BaseExporter):
             csv_writer.writerow(col)
             csv_writer.writerows(self.serialize(obj))
 
-    def serialize(self, obj, columns=None):
-        if not self._adapter:
-            self._adapter = SqlTypeAdapter.from_default_mapper()
-            self._adapter.register_mapper(type(None), lambda x: None)
+    def writer_to_memory(self, obj, col):
+        s = io.StringIO()
+        writer = csv.writer(s)
+        writer.writerow(col)
+        writer.writerows(obj)
+        s.seek(0)
 
-        return self._adapter.parse(obj)
+        buf = io.BytesIO()
+        buf.write(s.getvalue().encode())
+        buf.seek(0)
+        return buf
 
 
 class JsonExporter(BaseExporter):
@@ -78,6 +102,9 @@ class JsonExporter(BaseExporter):
     def write_to_file(self, filename, obj, col=None):
         with open(filename, 'w') as file:
             file.write(self.serialize(obj, col))
+
+    def writer_to_memory(self, obj, col):
+        return self.serialize(obj, col)
 
     @classmethod
     def serialize(cls, obj, columns):
