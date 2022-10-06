@@ -119,5 +119,5 @@ exporter.write_to_file('rows.parquet', rows, ['id', 'name', 'password'])
 
 
 # development progress
-for the release notes and development progress, pls find the [following files](./release notes.md)
+for the release notes and development progress, pls find the [following files](release%20notes.md)
 
