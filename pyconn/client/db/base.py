@@ -10,8 +10,10 @@ class BaseDBClient(ABC):
         self._conn = None
         self._cursor = None
 
-    def get_db_params(self) -> dict:
-        return self._db_params
+    def get_db_params(self, k=None) -> dict:
+        if not k:
+            return self._db_params
+        return self._db_params.get(k)
 
     @classmethod
     def from_db_params(cls, db_type, host, user, password, port, db, **kwargs):
@@ -82,3 +84,17 @@ class BaseDBClient(ABC):
         self._cursor.close()
         self._conn.close()
         return
+
+
+class AsyncDBClient:
+    def __init__(self, db_params):
+        self._db_params: dict = db_params
+
+    @classmethod
+    def from_kv(cls, **kwargs):
+        db_params = Addict()
+        db_params.update(**kwargs)
+        return cls(db_params.to_dict())
+
+    def connect_execute(self, sql):
+        raise NotImplementedError
