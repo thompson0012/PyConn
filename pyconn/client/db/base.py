@@ -10,7 +10,7 @@ class BaseDBClient(ABC):
         self._conn = None
         self._cursor = None
 
-    def get_db_params(self, k=None) -> dict:
+    def get_db_params(self, k=None):
         if not k:
             return self._db_params
         return self._db_params.get(k)
