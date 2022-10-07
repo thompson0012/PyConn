@@ -7,8 +7,8 @@ class UpsertDBSyncClient(BaseSyncDBClient):
     primary key must be present in database for the batch upsert
     """
 
-    def __init__(self, source_client=None, target_client=None, encode='stringify'):
-        super(UpsertDBSyncClient, self).__init__(source_client, target_client, encode)
+    def __init__(self, source_client=None, target_client=None):
+        super(UpsertDBSyncClient, self).__init__(source_client, target_client)
         self._can_upsert_sync = False
 
     def _validate_upsert_sync(self):

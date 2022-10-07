@@ -5,7 +5,7 @@ from typing import Optional
 
 class BaseSyncDBClient:
 
-    def __init__(self, source_client=None, target_client=None, encode='stringify'):
+    def __init__(self, source_client=None, target_client=None):
         self._source_client: BaseDBClient = source_client
         self._target_client: BaseDBClient = target_client
         self._type_adapter: Optional[SqlTypeAdapter] = None

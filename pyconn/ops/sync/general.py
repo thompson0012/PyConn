@@ -8,8 +8,8 @@ class GeneralDBSyncClient(BaseSyncDBClient):
     you have to make sure the target table already created and match the schema
     """
 
-    def __init__(self, source_client=None, target_client=None, encode='stringify'):
-        super(GeneralDBSyncClient, self).__init__(source_client, target_client, encode)
+    def __init__(self, source_client=None, target_client=None):
+        super(GeneralDBSyncClient, self).__init__(source_client, target_client)
 
     def sync(self, batch_size):
         validate_all_true([self._extract_sql, self._load_sql])

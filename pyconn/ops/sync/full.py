@@ -7,8 +7,8 @@ class FullDBSyncClient(BaseSyncDBClient):
     full database sync, required to have dropped / create statement for table manipulation
     """
 
-    def __init__(self, source_client=None, target_client=None, encode='stringify'):
-        super(FullDBSyncClient, self).__init__(source_client, target_client, encode)
+    def __init__(self, source_client=None, target_client=None):
+        super(FullDBSyncClient, self).__init__(source_client, target_client)
         self._drop_sql = None
         self._create_sql = None
 
