@@ -18,7 +18,9 @@ class BaseLakeClient(ABC):
         lake_params.update(**kwargs)
         return cls(lake_params.to_dict())
 
-    def get_lake_params(self):
+    def get_lake_params(self, k=None):
+        if k:
+            return self._lake_params.get(k, None)
         return self._lake_params
 
     def connect(self):

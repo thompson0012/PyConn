@@ -11,41 +11,16 @@ class GCSClient(BaseLakeClient):
 
         Args:
             lake_params: dict
-            {"bucket":"abc",
-            "credentials":{"type":'',
-                            "project_id":'',
-                            "private_key_id":'',
-                            "private_key":'',
-                            "client_email":'',
-                            "client_id":'',
-                            "auth_uri":'',
-                            "token_uri":'',
-                            "auth_provider_x509_cert_url":'',
-                            "client_x509_cert_url":'',
-                            }}
+            {"bucket_params":{"bucket_name":"test"}}
         """
         super(GCSClient, self).__init__(lake_params)
         self._conn: Bucket
 
-    @classmethod
-    def from_credential_files(cls, lake_params: dict):
-        import os
-        import json
-        path = os.environ['GOOGLE_APPLICATION_CREDENTIALS']
-        s = open(path)
-        credentials = json.loads(s)
-        lake_params.update({'credentials': credentials})
-        return cls(lake_params)
-
     def connect(self):
-        validate_keys(self.get_lake_params(), require=['bucket', 'credentials'])
-        validate_keys(self.get_lake_params().get('credentials', {}),
-                      require=["type", "project_id", "private_key_id", "private_key", "client_email", "client_id",
-                               "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url"])
-        credential = service_account.Credentials.from_service_account_info(
-            self.get_lake_params().get('credentials', {}))
-        self._client = Client(credentials=credential)
-        self._conn = self._client.bucket(self.get_lake_params().get('bucket', {}))
+        validate_keys(self.get_lake_params(), require=['bucket_params'])
+        validate_keys(self.get_lake_params('bucket_params'), require=['bucket_name'])
+        self._client = Client()
+        self._conn = self._client.bucket(**self.get_lake_params('bucket_params'))
 
     def upload(self, destination_name, method, **kwargs):
         self._conn: Bucket
