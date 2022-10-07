@@ -17,40 +17,6 @@ class PostgresSQLClient(BaseDBClient):
         self._cursor = conn.cursor()
         return self
 
-    def execute(self, sql, keep_alive=False, commit=True):
-
-        if keep_alive:
-            q = self._cursor.execute(sql)
-            if commit:
-                self._conn.commit()
-            return self._cursor
-
-        validate_opts_value(commit, True)
-        try:
-            self._cursor.execute(sql)
-            self._conn.commit()
-
-        except Exception as e:
-            print('failed', e)
-            self._conn.rollback()
-
-        finally:
-            self._cursor.close()
-            self._conn.close()
-
-    def execute_many(self, sql_ls: List[str]):
-        try:
-            for sql in sql_ls:
-                self._cursor.execute(sql)
-                self._conn.commit()
-
-        except Exception as e:
-            print('failed', e)
-            self._conn.rollback()
-
-        finally:
-            self.disconnect()
-
 
 class AsyncPostgresSQLClient(PostgresSQLClient):
     def __init__(self, db_params):

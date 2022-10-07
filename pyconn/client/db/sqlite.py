@@ -15,40 +15,6 @@ class SQLiteClient(BaseDBClient):
         self._cursor = conn.cursor()
         return self
 
-    def execute(self, sql, keep_alive=False, commit=True):
-
-        if keep_alive:
-            q = self._cursor.execute(sql)
-            if commit:
-                self._conn.commit()
-            return self._cursor
-
-        validate_opts_value(commit, True)
-        try:
-            self._cursor.execute(sql)
-            self._conn.commit()
-
-        except Exception as e:
-            print('failed', e)
-            self._conn.rollback()
-
-        finally:
-            self._cursor.close()
-            self._conn.close()
-
-    def execute_many(self, sql_ls: List[str]):
-        try:
-            for sql in sql_ls:
-                self._cursor.execute(sql)
-                self._conn.commit()
-
-        except Exception as e:
-            print('failed', e)
-            self._conn.rollback()
-
-        finally:
-            self.disconnect()
-
     def show_table_schema(self, tbl_name):
         data = self.execute(f'pragma table_info({tbl_name})', keep_alive=True).fetchall()
         return map(lambda x: tuple_to_dict(x, ['cid', 'name', 'type', 'notnull', 'dflt_value', 'pk']), data)

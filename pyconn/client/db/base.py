@@ -44,11 +44,33 @@ class BaseDBClient(ABC):
     def reconnect(self):
         return self.connect()
 
-    def execute(self, sql, keep_alive: bool, commit=True) -> "Cursor":
-        raise NotImplementedError
+    def execute(self, sql, auto_close=False):
 
-    def execute_many(self, sql_ls: List[str]):
-        raise NotImplementedError
+        try:
+            self._cursor.execute(sql)
+            self._conn.commit()
+
+        except Exception as e:
+            print('failed', e)
+            self._conn.rollback()
+
+        if auto_close:
+            self.disconnect()
+            return
+        return self._cursor
+
+    def execute_many(self, sql, *args, auto_close=False):
+        try:
+            self._cursor.executemany(sql, *args)
+            self._conn.commit()
+
+        except Exception as e:
+            print('failed', e)
+            self._conn.rollback()
+
+        if auto_close:
+            self.disconnect()
+        return self._cursor
 
     def get_conn(self):
         return self._conn
