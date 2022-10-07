@@ -1,17 +1,13 @@
 from pyconn.client.db.base import BaseDBClient
-from pyconn.utils.db_utils import SqlTypeAdapter
+from pyconn.utils.db_utils import SqlTypeAdapter, SqlJoiner, SqlRewriter
 from typing import Optional
 
 
 class BaseSyncDBClient:
-    JSONIFY_NULL = {'"null"': 'null'}
-    STRINGIFY_NULL = {"'null'": 'null'}
 
     def __init__(self, source_client=None, target_client=None, encode='stringify'):
         self._source_client: BaseDBClient = source_client
         self._target_client: BaseDBClient = target_client
-        self._encode = encode
-        self._NULL_REPLACE = self.STRINGIFY_NULL if self._encode == 'stringify' else self.JSONIFY_NULL
         self._type_adapter: Optional[SqlTypeAdapter] = None
 
         self._extract_sql = None
@@ -35,7 +31,7 @@ class BaseSyncDBClient:
         self._source_client.connect()
         return
 
-    def close_all(self):
+    def disconnect_all(self):
         self._source_client.disconnect()
         self._target_client.disconnect()
         return
@@ -59,7 +55,7 @@ class BaseSyncDBClient:
         return self._target_client
 
     def run_extract_sql(self):
-        q = self._source_client.execute(self._extract_sql, True, True)
+        q = self._source_client.execute(self._extract_sql, auto_close=False)
         return q
 
     def sync(self, batch_size):

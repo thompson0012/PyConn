@@ -1,8 +1,5 @@
-from pyconn.client.db.base import BaseDBClient
 from pyconn.ops.sync.base import BaseSyncDBClient
 from pyconn.utils.validator import validate_all_true
-from pyconn.utils.db_utils import substitute_sql, SqlJoiner, SqlTypeAdapter, SqlRewriter
-import re
 
 
 class FullDBSyncClient(BaseSyncDBClient):
@@ -27,23 +24,15 @@ class FullDBSyncClient(BaseSyncDBClient):
         validate_all_true([self._extract_sql, self._load_sql, self._create_sql, self._drop_sql])
         job_count = 0
         q = self.run_extract_sql()
-        self.get_target_client().execute(self._drop_sql, keep_alive=True, commit=True)
-        self.get_target_client().execute(self._create_sql, keep_alive=True, commit=True)
+        self.get_target_client().execute(self._drop_sql)
+        self.get_target_client().execute(self._create_sql)
         while True:
 
             rows = q.fetchmany(batch_size)
             if not bool(rows):
                 break
 
-            rows = self._type_adapter.parse(rows)
-            resolved_rows = SqlJoiner().join(rows, self._encode)
-
-            rewriter = SqlRewriter()
-            rewriter.register_rewrite_mapper("(?<![\w\d]){placeholder}(?![\w\d])", resolved_rows)
-            rewriter.register_rewrite_mapper(*list(self._NULL_REPLACE)[0])
-            rewrote_sql = rewriter.rewrite(self._load_sql)
-
-            self._target_client.execute(rewrote_sql, True, True)
+            self._target_client.execute_many(self._load_sql, rows)
             job_count += 1
-
+        self.disconnect_all()
         return
