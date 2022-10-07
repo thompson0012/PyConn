@@ -12,21 +12,6 @@ def tuple_to_dict(tuple_values, dict_key):
     return dict(zip(dict_key, tuple_values))
 
 
-# I think there have another smart way to substitute the sql
-# SQL injection should only be occurred when user operates in something that is not author's original intend
-
-def substitute_string(template: str, values: str, placeholder='{{values}}'):
-    sub_string = re.sub("(?<![\w\d]){placeholder}(?![\w\d])".format(placeholder=placeholder), values, template)
-    return sub_string
-
-
-def substitute_sql(template: str, values: str, placeholder='{{values}}', null_handle=True):
-    sub_sql = substitute_string(template, values, placeholder)
-    if null_handle:
-        return re.sub("'null'", "null", sub_sql)
-    return sub_sql
-
-
 class SqlRewriter:
     def __init__(self, rewrite_mapper=None):
         self._mapper = rewrite_mapper
@@ -47,11 +32,6 @@ class SqlRewriter:
             rewrote_sql = re.sub(k, v, rewrote_sql)
 
         return rewrote_sql
-
-
-def remove_all_line_breaks(string: str):
-    compiler = re.compile('/(\r\n)+|\r+|\n+|\t+/')
-    return compiler.sub("", string)
 
 
 class SqlJoiner:
@@ -145,7 +125,6 @@ class SqlTypeAdapter(BaseSqlTypeConvAdap):
         for i in self.DEFAULT_DTYPE:
             self.register_mapper(i, i)
 
-        self.register_mapper(NoneType, lambda x: 'null')
         return
 
     def parse(self, rows: List[Tuple]):
