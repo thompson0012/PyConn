@@ -32,12 +32,6 @@ class BaseDBClient(ABC):
         db_params.update(**kwargs)
         return cls(db_params.to_dict())
 
-    def register_conv(self, value_type, handler_func: Callable):
-        raise NotImplementedError
-
-    def init_default_conv(self):
-        raise NotImplementedError
-
     def connect(self) -> "BaseDBClient":
         raise NotImplementedError
 
@@ -59,7 +53,7 @@ class BaseDBClient(ABC):
             return
         return self._cursor
 
-    def execute_many(self, sql, *args, auto_close=False):
+    def executemany(self, sql, *args, auto_close=False):
         try:
             self._cursor.executemany(sql, *args)
             self._conn.commit()

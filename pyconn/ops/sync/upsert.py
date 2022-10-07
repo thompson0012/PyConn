@@ -26,7 +26,7 @@ class UpsertDBSyncClient(BaseSyncDBClient):
             if not bool(rows):
                 break
 
-            self._target_client.execute_many(self._load_sql, rows)
+            self._target_client.executemany(self._load_sql, rows)
             job_count += 1
         self.disconnect_all()
         return

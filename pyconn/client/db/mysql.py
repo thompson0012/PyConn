@@ -10,25 +10,6 @@ class MySQLClient(BaseDBClient):
     def __init__(self, db_params):
         super(MySQLClient, self).__init__(db_params)
 
-    def register_conv(self, value_type, handler_func: Callable):
-        validate_opts_type(value_type, int)
-        validate_opts_type(handler_func, Callable)
-
-        conversions = self._db_params.get('conv', pymysql.converters.conversions)
-        converter = SqlTypeAdapter(conversions)
-        converter.register_mapper(value_type, handler_func)
-        self._db_params.update({'conv': converter.get_mapper()})
-        return
-
-    def init_default_conv(self):
-        self.register_conv(pymysql.FIELD_TYPE.DECIMAL, float)
-        self.register_conv(pymysql.FIELD_TYPE.DATE, str)
-        self.register_conv(pymysql.FIELD_TYPE.TIMESTAMP, str)
-        self.register_conv(pymysql.FIELD_TYPE.DATETIME, str)
-        self.register_conv(pymysql.FIELD_TYPE.TIME, str)
-
-        return
-
     def connect(self):
         conn = pymysql.connect(**self.get_db_params())
         self._conn = conn
