@@ -16,9 +16,9 @@ class SQLiteClient(BaseDBClient):
         return self
 
     def show_table_schema(self, tbl_name):
-        data = self.execute(f'pragma table_info({tbl_name})', keep_alive=True).fetchall()
+        data = self.execute(f'pragma table_info({tbl_name})').fetchall()
         return map(lambda x: tuple_to_dict(x, ['cid', 'name', 'type', 'notnull', 'dflt_value', 'pk']), data)
 
     def show_table_ddl(self, tbl_name):
-        data = self.execute(f'select * from sqlite_schema where tbl_name="{tbl_name}"', keep_alive=True).fetchall()
+        data = self.execute(f'select * from sqlite_schema where tbl_name="{tbl_name}"').fetchall()
         return map(lambda x: tuple_to_dict(x, ['type', 'name', 'tbl_name', 'rootpage', 'sql']), data)

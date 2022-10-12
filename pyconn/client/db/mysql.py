@@ -12,6 +12,7 @@ class MySQLClient(BaseDBClient):
         conn = pymysql.connect(**self.get_db_params())
         self._conn = conn
         self._cursor = conn.cursor()
+        self._cursor.execute()
         return self
 
     def show_table_schema(self, tbl_name):
@@ -37,10 +38,10 @@ class AsyncMySQLClient(AsyncDBClient, MySQLClient):
         self._conn = conn
         self._cursor = cursor
 
-    def execute(self, sql, auto_close=False):
+    def execute(self, sql, *args, **kwargs):
         async def do_execute():
             try:
-                q = await self._cursor.execute(sql)
+                q = await self._cursor.execute(sql, *args, **kwargs)
                 await self._conn.commit()
             except Exception as e:
                 print('failed:', e)
