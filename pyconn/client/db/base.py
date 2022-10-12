@@ -40,32 +40,31 @@ class BaseDBClient(ABC):
     def reconnect(self):
         return self.connect()
 
-    def execute(self, sql, auto_close=False):
+    def execute(self, sql: str, params=None, *args, **kwargs):
 
         try:
-            self._cursor.execute(sql)
-            self._conn.commit()
+            if params is not None:
+                self._cursor.execute(sql, params, *args, **kwargs)
+                self._conn.commit()
+            else:
+                self._cursor.execute(sql, *args, **kwargs)
+                self._conn.commit()
 
         except Exception as e:
             print('failed', e)
             self._conn.rollback()
 
-        if auto_close:
-            self.disconnect()
-            return
         return self._cursor
 
-    def executemany(self, sql, *args, auto_close=False):
+    def executemany(self, sql, params_seq, *args, **kwargs):
         try:
-            self._cursor.executemany(sql, *args)
+            self._cursor.executemany(sql, params_seq, *args, **kwargs)
             self._conn.commit()
 
         except Exception as e:
             print('failed', e)
             self._conn.rollback()
 
-        if auto_close:
-            self.disconnect()
         return self._cursor
 
     def get_conn(self):
