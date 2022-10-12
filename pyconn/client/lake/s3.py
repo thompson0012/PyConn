@@ -6,10 +6,17 @@ from pyconn.client.lake.base import BaseLakeClient
 
 class S3Client(BaseLakeClient):
     def __init__(self, lake_params):
+        """
+
+        Parameters
+        ----------
+        lake_params: dict, {'bucket_params': {'bucket': 'test'}}
+        """
         super(S3Client, self).__init__(lake_params)
 
     def connect(self):
-        validate_keys(self.get_lake_params(), require=['bucket'])
+        validate_keys(self.get_lake_params(), require=['bucket_params'])
+        validate_keys(self.get_lake_params('bucket_params'), require=['bucket'])
         self._client = boto3.client('s3')
         self._conn = self._client.Bucket(self.get_lake_params().get('bucket', {}))
 
