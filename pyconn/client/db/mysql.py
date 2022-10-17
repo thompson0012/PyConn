@@ -12,7 +12,6 @@ class MySQLClient(BaseDBClient):
         conn = pymysql.connect(**self.get_db_params())
         self._conn = conn
         self._cursor = conn.cursor()
-        self._cursor.execute()
         return self
 
     def show_table_schema(self, tbl_name):
