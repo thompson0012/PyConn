@@ -1,8 +1,9 @@
 [tool.poetry]
-name = "pyconn"
-version = "0.1.0"
+name = "python-connect"
+version = "0.1.1"
 description = "python database manipulation with advanced features"
 authors = ["Thompson <51963680+thompson0012@users.noreply.github.com>"]
+packages = [{ include = "pyconn", from = 'src' }]
 
 [tool.poetry.dependencies]
 python = ">=3.10, <3.11"
@@ -10,28 +11,34 @@ sqlmodel = "^0.0.8"
 pydantic = "^1.10.1"
 toml = "^0.10.2"
 addict = "^2.4.0"
-sqlglot = "^5.3.1"
 pampy = "^0.3.0"
 Humre = "^0.2.0"
 pendulum = "^2.1.2"
-bson = "^0.5.10"
-orjson = "^3.8.0"
-psycopg = {extras = ["binary"], version = "^3.1.2"}
+psycopg = { extras = ["binary"], version = "^3.1.2", optional = true }
+google-cloud-bigquery = { version = "^3.3.2", optional = true }
+google-cloud-storage = { version = "^2.5.0", optional = true }
+s3 = { version = "^3.0.0", optional = true }
+psycopg = { version = "^3.1.1", optional = true }
+asyncpg = { version = "^0.26.0", optional = true }
+aiomysql = { version = "^0.1.1", optional = true }
+boto3 = { version = "^1.24.69", optional = true }
 
 [tool.poetry.dev-dependencies]
-google-cloud-storage = "^2.5.0"
-s3 = "^3.0.0"
-aiomysql = "^0.1.1"
-asyncpg = "^0.26.0"
-psycopg = "^3.1.1"
-google-cloud-bigquery = "^3.3.2"
-modin = {extras = ["dask"], version = "^0.15.3"}
-boto3 = "^1.24.69"
+modin = { extras = ["dask"], version = "^0.15.3" }
 flashtext = "^2.7"
 sqloxide = "^0.1.22"
 Faker = "^14.2.0"
 PySnooper = "^1.1.1"
 nest-asyncio = "^1.5.6"
+orjson = "^3.8.0"
+bson = "^0.5.10"
+sqlglot = "^5.3.1"
+
+[tool.poetry.extras]
+google = ['google-cloud-bigquery', 'google-cloud-storage']
+aws = ['boto3', 's3']
+mysql = ['pymysql', 'aiomysql']
+pgsql = ['psycopg', 'asyncpg']
 
 
 [build-system]
