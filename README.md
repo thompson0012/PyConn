@@ -33,7 +33,7 @@ we need a tool that can fill the gap, that's what PyConn to do!
 # install
 
 ```shell
-pip install pyconn
+pip install python-connect
 ```
 
 # features
